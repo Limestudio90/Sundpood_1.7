@@ -1,0 +1,17 @@
+QWidget {
+    background: rgb(44, 44, 44);    
+    font: 25 14pt "Calibri Light";
+}
+
+QLabel {
+    background: none;
+}
+
+QPushButton {
+    background: rgb(58, 58, 58);
+    border: none;
+}
+
+QPushButton:hover {
+    background: rgb(53, 53, 53);
+}
