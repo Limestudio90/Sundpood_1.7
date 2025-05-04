@@ -1,4 +1,13 @@
+<<<<<<< HEAD
 PyQt5
 pynput==1.6.8
 sounddevice
 pygame
+=======
+# Requisiti per Sundpood 1.7
+cryptography>=36.0.0
+pygame>=2.1.0
+sounddevice>=0.4.4
+pynput>=1.6.8
+PyQt5>=5.15.6
+>>>>>>> ece3901 (Aggiornamento del progetto)
