@@ -2,15 +2,13 @@
 
 
 
+![Banner](https://github.com/Ninnjah/Sundpood/blob/master/pics/banner.jpg)
+
+App like [SoundPad](https://www.leppsoft.com/soundpad/en/download/)(needs [VoiceMeeter](https://vb-audio.com/Voicemeeter/)(allready in "redist" folder))
 
 Installation Video tutorial:
 (https://www.youtube.com/watch?v=9ziwI9BZXOc)
 
-
-
-![Banner](https://github.com/Ninnjah/Sundpood/blob/master/pics/banner.jpg)
-
-App like [SoundPad](https://www.leppsoft.com/soundpad/en/download/)(needs [VoiceMeeter](https://vb-audio.com/Voicemeeter/)(allready in "redist" folder))
 
 ### Features:
 - Play sound by pressing hotkey
