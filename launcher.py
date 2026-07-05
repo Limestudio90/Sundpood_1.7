@@ -21,6 +21,20 @@ from data import ui_overlay
 from data import keys
 ### ^^^                                    ^^^ ###
 
+
+def get_runtime_root():
+    if getattr(sys, 'frozen', False):
+        executable_dir = os.path.dirname(sys.executable)
+        internal_dir = os.path.join(executable_dir, '_internal')
+        if os.path.isdir(internal_dir):
+            return internal_dir
+        meipass_dir = getattr(sys, '_MEIPASS', '')
+        if meipass_dir and os.path.isdir(meipass_dir):
+            return meipass_dir
+        return executable_dir
+
+    return os.path.dirname(os.path.abspath(__file__))
+
 def decrypt(filename, key):
     # Расшифруем файл и записываем его
     f = Fernet(key)
@@ -33,16 +47,20 @@ def decrypt(filename, key):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    runtime_root = get_runtime_root()
+    os.chdir(runtime_root)
+    main_path = os.path.join(runtime_root, 'data', 'main.py')
     
     # Create a namespace to hold our globals
     namespace = {
         'app': app,
         '__name__': '__main__',
+        '__file__': main_path,
         **globals()
     }
     
-    if os.path.exists(os.path.join('data', 'main.py')):
-        with open(os.path.join('data', 'main.py'), 'r', encoding='utf-8') as f:
+    if os.path.exists(main_path):
+        with open(main_path, 'r', encoding='utf-8') as f:
             exec(f.read(), namespace)
     else:
         if key is None:

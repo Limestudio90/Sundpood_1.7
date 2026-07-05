@@ -1,10 +1,15 @@
-# Sundpood 2.0
+# Sundpood 2.0.1
 
 
 
 ![Banner](https://github.com/Ninnjah/Sundpood/blob/master/pics/banner.jpg)
 
 App like [SoundPad](https://www.leppsoft.com/soundpad/en/download/), usable with Virtual Audio Cable or other virtual output devices.
+
+### Version 2.0.1
+- Hotfix for exported Windows build startup and audio routing stability
+- More reliable device selection across WASAPI, DirectSound and MME
+- Safer microphone passthrough pairing for USB interfaces and VB-Cable
 
 ### Version 2.0
 - Virtual Audio Cable routing support

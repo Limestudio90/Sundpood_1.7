@@ -1,4 +1,4 @@
-#\ SundPood version 2.0 /#
+#\ SundPood version 2.0.1 /#
 
 import os
 import sys
@@ -168,6 +168,12 @@ if __name__ == '__main__':
         'cable input',
         'voicemeeter input',
     ]
+    HOSTAPI_PREFERENCE = [
+        'Windows WASAPI',
+        'Windows DirectSound',
+        'MME',
+        'Windows WDM-KS',
+    ]
     DEFAULT_AUDIO_SETTINGS = {
         'input': '',
         'output': '',
@@ -260,6 +266,19 @@ if __name__ == '__main__':
         normalized = normalized.replace('-', ' ')
         return normalized
 
+    def get_hostapi_name(hostapi_index):
+        try:
+            return sd.query_hostapis(hostapi_index)['name']
+        except Exception:
+            return ''
+
+    def get_hostapi_priority(hostapi_index):
+        hostapi_name = get_hostapi_name(hostapi_index)
+        try:
+            return HOSTAPI_PREFERENCE.index(hostapi_name)
+        except ValueError:
+            return len(HOSTAPI_PREFERENCE)
+
     def get_pygame_output_name(output_name):
         if not output_name:
             return ''
@@ -283,6 +302,40 @@ if __name__ == '__main__':
                 return pygame_name
 
         return output_name
+
+    def init_pygame_mixer(output_name=''):
+        requested_name = (output_name or '').strip()
+        candidate_names = []
+
+        if requested_name:
+            candidate_names.append(get_pygame_output_name(requested_name))
+            candidate_names.append(requested_name)
+
+        unique_candidates = []
+        for candidate in candidate_names:
+            candidate = (candidate or '').strip()
+            if candidate and candidate not in unique_candidates:
+                unique_candidates.append(candidate)
+
+        pg.mixer.quit()
+        pg.mixer.pre_init(44100, -16, 2, 2048)
+
+        errors = []
+        for candidate in unique_candidates:
+            try:
+                pg.mixer.init(devicename=candidate)
+                return candidate
+            except Exception as exc:
+                errors.append(f"{candidate}: {exc}")
+                pg.mixer.quit()
+                pg.mixer.pre_init(44100, -16, 2, 2048)
+
+        try:
+            pg.mixer.init()
+            return ''
+        except Exception as exc:
+            errors.append(f"default device: {exc}")
+            raise RuntimeError('\n'.join(errors))
 
     def get_files(dir_, config):
         '''
@@ -515,6 +568,15 @@ if __name__ == '__main__':
             if lowered_name in device['name'].lower() or device['name'].lower() in lowered_name:
                 candidates.append((index, device))
 
+        channel_key = 'max_input_channels' if wants_input else 'max_output_channels'
+        candidates.sort(
+            key=lambda item: (
+                get_hostapi_priority(item[1]['hostapi']),
+                int(item[1].get(channel_key, 0) or 0),
+                item[0],
+            )
+        )
+
         return candidates
 
     def get_duplex_device_pairs(input_name, output_name):
@@ -524,24 +586,31 @@ if __name__ == '__main__':
         if not input_candidates or not output_candidates:
             return []
 
-        exact_pair = []
-        same_hostapi_pairs = []
-        fallback_pairs = []
+        ranked_pairs = []
 
         selected_input_idx = pref.inputDeviceCombo.currentData() if hasattr(pref, 'inputDeviceCombo') else None
         selected_output_idx = pref.outputDeviceCombo.currentData() if hasattr(pref, 'outputDeviceCombo') else None
 
         for input_idx, input_device in input_candidates:
             for output_idx, output_device in output_candidates:
-                pair = (input_idx, output_idx, input_device, output_device)
-                if input_idx == selected_input_idx and output_idx == selected_output_idx:
-                    exact_pair.append(pair)
-                elif input_device['hostapi'] == output_device['hostapi']:
-                    same_hostapi_pairs.append(pair)
-                else:
-                    fallback_pairs.append(pair)
+                same_hostapi = input_device['hostapi'] == output_device['hostapi']
+                ranked_pairs.append((
+                    (
+                        0 if (input_idx == selected_input_idx and output_idx == selected_output_idx and same_hostapi) else 1,
+                        0 if same_hostapi else 1,
+                        get_hostapi_priority(input_device['hostapi']),
+                        abs(
+                            int(input_device.get('default_samplerate', 44100) or 44100) -
+                            int(output_device.get('default_samplerate', 44100) or 44100)
+                        ),
+                        int(output_device.get('max_output_channels', 0) or 0),
+                        int(input_device.get('max_input_channels', 0) or 0),
+                    ),
+                    (input_idx, output_idx, input_device, output_device)
+                ))
 
-        return exact_pair + same_hostapi_pairs + fallback_pairs
+        ranked_pairs.sort(key=lambda item: item[0])
+        return [pair for _, pair in ranked_pairs]
 
     def start_microphone_passthrough(input_idx=None, output_idx=None):
         global mic_passthrough_stream
@@ -579,6 +648,19 @@ if __name__ == '__main__':
 
             for samplerate in sample_rates:
                 try:
+                    sd.check_input_settings(
+                        device=candidate_input_idx,
+                        samplerate=samplerate,
+                        channels=stream_channels,
+                        dtype='float32',
+                    )
+                    sd.check_output_settings(
+                        device=candidate_output_idx,
+                        samplerate=samplerate,
+                        channels=stream_channels,
+                        dtype='float32',
+                    )
+
                     def microphone_callback(indata, outdata, frames, time_info, status):
                         if status:
                             print(status)
@@ -599,11 +681,11 @@ if __name__ == '__main__':
                     mic_passthrough_stream = sd.Stream(
                         device=(candidate_input_idx, candidate_output_idx),
                         samplerate=samplerate,
-                        channels=(stream_channels, output_channels),
+                        channels=(stream_channels, stream_channels),
                         dtype='float32',
                         callback=microphone_callback,
                         blocksize=0,
-                        latency='low',
+                        latency='high',
                     )
                     mic_passthrough_stream.start()
 
@@ -729,7 +811,7 @@ if __name__ == '__main__':
 
     def check_update():
         if key is None:
-            raise ModuleNotFoundError("Missing 'key' module required for encrypted runtime update check")
+            return VERSION
 
         def decrypt(filename, key):
             f = Fernet(key)
@@ -828,6 +910,21 @@ if __name__ == '__main__':
                 input_devices.append((i, device['name']))
             if device['max_output_channels'] > 0:
                 output_devices.append((i, device['name']))
+
+        input_devices.sort(
+            key=lambda item: (
+                get_hostapi_priority(sd.query_devices(item[0])['hostapi']),
+                normalize_device_name(item[1]),
+                item[0],
+            )
+        )
+        output_devices.sort(
+            key=lambda item: (
+                get_hostapi_priority(sd.query_devices(item[0])['hostapi']),
+                normalize_device_name(item[1]),
+                item[0],
+            )
+        )
         
         input_blocker = QtCore.QSignalBlocker(pref.inputDeviceCombo)
         output_blocker = QtCore.QSignalBlocker(pref.outputDeviceCombo)
@@ -850,6 +947,12 @@ if __name__ == '__main__':
             input_index = pref.inputDeviceCombo.findText(saved_input)
             if input_index >= 0:
                 pref.inputDeviceCombo.setCurrentIndex(input_index)
+            else:
+                normalized_saved_input = normalize_device_name(saved_input)
+                for combo_index in range(pref.inputDeviceCombo.count()):
+                    if normalize_device_name(pref.inputDeviceCombo.itemText(combo_index)) == normalized_saved_input:
+                        pref.inputDeviceCombo.setCurrentIndex(combo_index)
+                        break
         elif pref.inputDeviceCombo.count() > 0:
             preferred_input = find_input_device()
             input_index = pref.inputDeviceCombo.findText(preferred_input)
@@ -860,6 +963,12 @@ if __name__ == '__main__':
             output_index = pref.outputDeviceCombo.findText(saved_output)
             if output_index >= 0:
                 pref.outputDeviceCombo.setCurrentIndex(output_index)
+            else:
+                normalized_saved_output = normalize_device_name(saved_output)
+                for combo_index in range(pref.outputDeviceCombo.count()):
+                    if normalize_device_name(pref.outputDeviceCombo.itemText(combo_index)) == normalized_saved_output:
+                        pref.outputDeviceCombo.setCurrentIndex(combo_index)
+                        break
         elif pref.outputDeviceCombo.count() > 0:
             preferred_output = find_output_device()
             output_index = pref.outputDeviceCombo.findText(preferred_output)
@@ -891,10 +1000,7 @@ if __name__ == '__main__':
                 current_input = sd.default.device[0] if isinstance(sd.default.device, (list, tuple)) else None
                 sd.default.device = (current_input, output_idx)
 
-            if output_name:
-                mixer_output_name = get_pygame_output_name(output_name)
-                pg.mixer.quit()
-                pg.mixer.init(devicename=mixer_output_name)
+            init_pygame_mixer(output_name)
 
             if mic_passthrough_enabled:
                 start_microphone_passthrough(input_idx, output_idx)
@@ -947,8 +1053,7 @@ if __name__ == '__main__':
                     sd.default.device[0] = input_idx
                 if output_idx is not None:
                     sd.default.device[1] = output_idx
-                    pg.mixer.quit()
-                    pg.mixer.init(devicename=self.outputCombo.currentText())
+                    init_pygame_mixer(self.outputCombo.currentText())
                 
                 # Save settings
                 config_data = jsonread(config)
@@ -1036,7 +1141,7 @@ if __name__ == '__main__':
         
         if __name__ == '__main__':
             ### Глобальные переменные ###
-            VERSION = "2.0"
+            VERSION = "2.0.1"
             dir_ = 'sound'
             config = 'settings.json'
         
@@ -1066,10 +1171,9 @@ if __name__ == '__main__':
             
             ### Поиск устроства ввода ###
             try:
-                pg.mixer.pre_init(44100, -16, 2, 2048)
                 startup_config = get_audio_settings()
                 saved_output = startup_config.get('output', '')
-                pg.mixer.init(devicename=get_pygame_output_name(find_output_device(saved_output)))
+                init_pygame_mixer(find_output_device(saved_output))
             except Exception as e:
                 msg = QtWidgets.QMessageBox()
                 msg.setIcon(QtWidgets.QMessageBox.Critical)
@@ -1080,7 +1184,7 @@ if __name__ == '__main__':
                 sys.exit(1)
             
             ### Глобальные переменные ###
-            VERSION = "2.0"
+            VERSION = "2.0.1"
             dir_ = 'sound'
             config = 'settings.json'
             get_files(dir_, config)             # Сбор всех аудиофайлов
