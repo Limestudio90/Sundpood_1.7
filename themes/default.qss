@@ -1,17 +1,245 @@
 QWidget {
-    background: rgb(44, 44, 44);    
-    font: 25 14pt "Calibri Light";
+    background: #151821;
+    color: #f5f7fb;
+    font: 11pt "Segoe UI";
 }
 
 QLabel {
-    background: none;
+    background: transparent;
 }
 
 QPushButton {
-    background: rgb(58, 58, 58);
-    border: none;
+    background: #2b3245;
+    border: 1px solid #3d4963;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font: 600 10pt "Segoe UI";
 }
 
 QPushButton:hover {
-    background: rgb(53, 53, 53);
+    background: #36415b;
+}
+
+QPushButton:pressed {
+    background: #20283a;
+}
+
+QListWidget {
+    background: #1b2130;
+    border: 1px solid #313b52;
+    border-radius: 16px;
+    padding: 10px;
+    outline: none;
+}
+
+QListWidget::item {
+    padding: 10px 12px;
+    border-radius: 10px;
+    margin: 2px 0;
+}
+
+QListWidget::item:hover {
+    background: #2a3449;
+}
+
+QListWidget::item:selected {
+    background: #6d7cff;
+    color: white;
+}
+
+QGroupBox {
+    background: #171c2b;
+    border: 1px solid #252d41;
+    border-radius: 20px;
+    margin-top: 18px;
+    padding-top: 18px;
+    font: 700 10pt "Segoe UI Semibold";
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 16px;
+    padding: 0 6px;
+    color: #cfd7ea;
+}
+
+QComboBox {
+    background: #1b2130;
+    border: 1px solid #313b52;
+    border-radius: 12px;
+    padding: 8px 12px;
+}
+
+QComboBox QAbstractItemView {
+    background: #1b2130;
+    border: 1px solid #313b52;
+    selection-background-color: #6d7cff;
+}
+
+QCheckBox {
+    spacing: 10px;
+}
+
+QCheckBox::indicator {
+    width: 18px;
+    height: 18px;
+}
+
+QCheckBox::indicator:unchecked {
+    border: 1px solid #4a5673;
+    border-radius: 6px;
+    background: #1b2130;
+}
+
+QCheckBox::indicator:checked {
+    border: 1px solid #6d7cff;
+    border-radius: 6px;
+    background: #6d7cff;
+}
+
+QSlider::groove:horizontal {
+    height: 8px;
+    background: #283146;
+    border-radius: 4px;
+}
+
+QSlider::sub-page:horizontal {
+    background: #6d7cff;
+    border-radius: 4px;
+}
+
+QSlider::add-page:horizontal {
+    background: #283146;
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+    background: #eef2ff;
+    border: 2px solid #6d7cff;
+    width: 18px;
+    height: 18px;
+    margin: -6px 0;
+    border-radius: 9px;
+}
+
+QScrollBar:vertical {
+    background: transparent;
+    width: 12px;
+    margin: 4px;
+}
+
+QScrollBar::handle:vertical {
+    background: #36415b;
+    border-radius: 6px;
+    min-height: 24px;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical,
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+    background: none;
+    border: none;
+}
+
+#background,
+#headerStrip {
+    background: #101522;
+    border-bottom: 1px solid #252d41;
+}
+
+#sidebarCard,
+#contentCard {
+    background: #171c2b;
+    border: 1px solid #252d41;
+    border-radius: 24px;
+}
+
+#overlayCard {
+    background: rgba(16, 21, 34, 230);
+    border: 1px solid rgba(84, 98, 130, 180);
+    border-radius: 18px;
+}
+
+#select_label {
+    background: #101522;
+    border: 1px solid #2a3248;
+    border-radius: 16px;
+    color: #eef2ff;
+    padding: 10px 16px;
+    font: 700 11pt "Segoe UI Semibold";
+}
+
+#app_title,
+#title {
+    font: 700 18pt "Segoe UI Semibold";
+    color: #ffffff;
+}
+
+#app_subtitle,
+#subtitle,
+#volume_hint,
+#library_hint {
+    color: #98a4bf;
+    font: 10pt "Segoe UI";
+}
+
+#label {
+    font: 700 11pt "Segoe UI Semibold";
+}
+
+#cat_label,
+#library_label,
+#volume_label,
+#pref_themes {
+    font: 700 10pt "Segoe UI Semibold";
+    color: #cfd7ea;
+}
+
+#play_button {
+    background: #6d7cff;
+    border: 1px solid #7f8cff;
+    color: white;
+}
+
+#play_button:hover {
+    background: #7c8aff;
+}
+
+#hkset {
+    background: #1f8f78;
+    border: 1px solid #22ab8c;
+    color: white;
+}
+
+#hkset:hover {
+    background: #24a389;
+}
+
+#delete_button {
+    background: #4a1f28;
+    border: 1px solid #683544;
+    color: #ffe5ea;
+}
+
+#delete_button:hover,
+#exit_button:hover {
+    background: #5c2631;
+    color: #ffd7dd;
+}
+
+#pref_button,
+#hotkeys_button,
+#min_button,
+#exit_button {
+    background: transparent;
+    border: none;
+    border-radius: 12px;
+    padding: 8px 12px;
+}
+
+#pref_button:hover,
+#hotkeys_button:hover,
+#min_button:hover {
+    background: #20283a;
 }

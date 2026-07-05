@@ -1,10 +1,17 @@
-# Sundpood
+# Sundpood 2.0
 
 
 
 ![Banner](https://github.com/Ninnjah/Sundpood/blob/master/pics/banner.jpg)
 
-App like [SoundPad](https://www.leppsoft.com/soundpad/en/download/)(needs [VoiceMeeter](https://vb-audio.com/Voicemeeter/)(allready in "redist" folder))
+App like [SoundPad](https://www.leppsoft.com/soundpad/en/download/), usable with Virtual Audio Cable or other virtual output devices.
+
+### Version 2.0
+- Virtual Audio Cable routing support
+- Microphone passthrough mixed into the virtual output
+- Modernized interface and refreshed themes
+- Refresh and folder import for the sound library
+- More robust audio device detection and routing
 
 Installation Video tutorial:
 (https://www.youtube.com/watch?v=9ziwI9BZXOc)
@@ -41,6 +48,6 @@ Installation Video tutorial:
 - [sounddevice](https://pypi.org/project/sounddevice/) for select audio device
 - [pynput](https://pypi.org/project/pynput/) for hotkeys
 - [PyQt5](https://pypi.org/project/PyQt5/) for GUI
-- [VoiceMeeter](https://vb-audio.com/Voicemeeter/) for redirect sound into microphone
+- A virtual audio device such as Virtual Audio Cable for redirecting sound into microphone/software input
 - ~~[ffmpeg](https://ffmpeg.org/download.html) for convert sounds in .wav format~~Now SundPood using pygame module
 - [PyGame](https://pypi.org/project/pygame/) for playing sounds

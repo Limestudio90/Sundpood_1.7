@@ -14,113 +14,63 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(420, 500)
+        MainWindow.resize(560, 700)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
         MainWindow.setSizePolicy(sizePolicy)
-        MainWindow.setMinimumSize(QtCore.QSize(420, 500))
-        MainWindow.setMaximumSize(QtCore.QSize(420, 500))
+        MainWindow.setMinimumSize(QtCore.QSize(560, 700))
+        MainWindow.setMaximumSize(QtCore.QSize(560, 700))
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("icon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
-        MainWindow.setStyleSheet("QWidget{\n"
-"    background: rgb(44, 44, 44);    \n"
-"    font: 25 14pt \"Calibri Light\";\n"
-"}\n"
-"\n"
-"QLabel{\n"
-"    background: none\n"
-"}\n"
-"\n"
-"QPushButton{\n"
-"    background: rgb(58, 58, 58);\n"
-"    border: none;\n"
-"}\n"
-"\n"
-"QPushButton:hover{\n"
-"    background: rgb(53, 53, 53);\n"
-"}\n"
-"\n"
-"QListWidget{\n"
-"    margin: 4px;\n"
-"    border: none;\n"
-"}\n"
-"\n"
-"QListWidget::item[Custom=\"true\"]{\n"
-"    background: rgb(48, 48, 48);\n"
-"}\n"
-"\n"
-"QListWidget::item:hover{\n"
-"    background:  rgb(53, 53, 53);\n"
-"}\n"
-"\n"
-"QListWidget::item:selected{\n"
-"    background: rgb(48, 48, 48);\n"
-"    color: black;\n"
-"}\n"
-"\n"
-"QScrollBar:vertical{\n"
-"    border: 1px transparent rgb(58, 58, 58);\n"
-"    border-radius: 4px;\n"
-"    background: rgb(48, 48, 48);\n"
-"    width: 16px;\n"
-"}\n"
-"\n"
-"QScrollBar::handle:vertical{\n"
-"    background: rgb(48, 48, 48);\n"
-"}\n"
-"\n"
-"QScrollBar::sub-page:vertical{\n"
-"    background: rgb(58, 58, 58);\n"
-"}\n"
-"\n"
-"QScrollBar::add-page:vertical{\n"
-"    background: rgb(58, 58, 58);\n"
-"}\n"
-"\n"
-"#background{\n"
-"    background:rgb(48, 48, 48);\n"
-"}\n"
-"\n"
-"#exit_button{\n"
-"    margin-bottom: 1px;\n"
-"}\n"
-"\n"
-"#exit_button:hover{\n"
-"    color: black;\n"
-"    background: rgba(254, 119, 122, 128);\n"
-"}\n"
-"\n"
-"#min_button{\n"
-"    margin-bottom: 1px;\n"
-"}\n"
-"\n"
-"#min_button:hover{\n"
-"    color: black;\n"
-"    background: rgba(194, 213, 254, 128);\n"
-"}\n"
-"\n"
-"#update_button:hover{\n"
-"    background:rgba(10, 128, 179, 128);\n"
-"}")
+        MainWindow.setStyleSheet("QWidget{background:#151821;color:#f5f7fb;font:11pt \"Segoe UI\";}\n"
+"QPushButton{background:#2b3245;border:1px solid #3d4963;border-radius:12px;padding:10px 14px;font-weight:600;}\n"
+"QPushButton:hover{background:#36415b;}\n"
+"QListWidget{background:#1b2130;border:1px solid #313b52;border-radius:16px;padding:10px;outline:none;}\n"
+"QListWidget::item{padding:10px 12px;border-radius:10px;margin:2px 0;}\n"
+"QListWidget::item:hover{background:#2a3449;}\n"
+"QListWidget::item:selected{background:#6d7cff;color:white;}\n"
+"QGroupBox{background:#171c2b;border:1px solid #252d41;border-radius:20px;margin-top:18px;padding-top:18px;font:700 10pt \"Segoe UI Semibold\";}\n"
+"QGroupBox::title{subcontrol-origin: margin;left:16px;padding:0 6px;color:#cfd7ea;}\n"
+"QComboBox,QSlider,QCheckBox{background:transparent;}\n"
+"QComboBox{background:#1b2130;border:1px solid #313b52;border-radius:12px;padding:8px 12px;}\n"
+"QComboBox QAbstractItemView{background:#1b2130;border:1px solid #313b52;selection-background-color:#6d7cff;}\n"
+"QCheckBox{spacing:10px;}\n"
+"QCheckBox::indicator{width:18px;height:18px;}\n"
+"QCheckBox::indicator:unchecked{border:1px solid #4a5673;border-radius:6px;background:#1b2130;}\n"
+"QCheckBox::indicator:checked{border:1px solid #6d7cff;border-radius:6px;background:#6d7cff;}\n"
+"QSlider::groove:horizontal{height:8px;background:#283146;border-radius:4px;}\n"
+"QSlider::sub-page:horizontal{background:#6d7cff;border-radius:4px;}\n"
+"QSlider::handle:horizontal{background:#eef2ff;border:2px solid #6d7cff;width:18px;height:18px;margin:-6px 0;border-radius:9px;}\n"
+"QLabel{background:transparent;}\n"
+"QScrollBar:vertical{background:transparent;width:12px;margin:4px;}\n"
+"QScrollBar::handle:vertical{background:#36415b;border-radius:6px;min-height:24px;}\n"
+"QScrollBar::add-line:vertical,QScrollBar::sub-line:vertical,QScrollBar::add-page:vertical,QScrollBar::sub-page:vertical{background:none;border:none;}\n"
+"#background{background:#101522;border-bottom:1px solid #252d41;}\n"
+"#title{font:700 18pt \"Segoe UI Semibold\";}\n"
+"#subtitle{color:#98a4bf;font:10pt \"Segoe UI\";}\n"
+"#exit_button,#min_button{background:transparent;border:none;border-radius:12px;padding:8px 12px;}\n"
+"#min_button:hover{background:#20283a;}\n"
+"#exit_button:hover{background:#4a1f28;color:#ffd7dd;}")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.exit_button = QtWidgets.QPushButton(self.centralwidget)
-        self.exit_button.setGeometry(QtCore.QRect(380, 0, 41, 31))
+        self.exit_button.setGeometry(QtCore.QRect(506, 12, 40, 40))
         self.exit_button.setStyleSheet("")
         self.exit_button.setObjectName("exit_button")
         self.min_button = QtWidgets.QPushButton(self.centralwidget)
-        self.min_button.setGeometry(QtCore.QRect(340, 0, 41, 31))
+        self.min_button.setGeometry(QtCore.QRect(460, 12, 40, 40))
         self.min_button.setStyleSheet("")
         self.min_button.setObjectName("min_button")
         self.gridLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.gridLayoutWidget.setGeometry(QtCore.QRect(10, 80, 391, 201))
+        self.gridLayoutWidget.setGeometry(QtCore.QRect(28, 126, 504, 206))
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
         self.gridLayout = QtWidgets.QGridLayout(self.gridLayoutWidget)
-        self.gridLayout.setContentsMargins(0, 0, 0, 0)
-        self.gridLayout.setHorizontalSpacing(6)
+        self.gridLayout.setContentsMargins(16, 16, 16, 16)
+        self.gridLayout.setHorizontalSpacing(18)
+        self.gridLayout.setVerticalSpacing(12)
         self.gridLayout.setObjectName("gridLayout")
         self.pref_over = QtWidgets.QLabel(self.gridLayoutWidget)
         self.pref_over.setStyleSheet("background:none")
@@ -163,51 +113,80 @@ class Ui_MainWindow(object):
         self.play_sound.setObjectName("play_sound")
         self.gridLayout.addWidget(self.play_sound, 5, 1, 1, 1)
         self.background = QtWidgets.QWidget(self.centralwidget)
-        self.background.setGeometry(QtCore.QRect(0, 0, 421, 71))
+        self.background.setGeometry(QtCore.QRect(0, 0, 560, 76))
         self.background.setStyleSheet("")
         self.background.setObjectName("background")
         self.title = QtWidgets.QLabel(self.background)
-        self.title.setGeometry(QtCore.QRect(10, 10, 161, 41))
+        self.title.setGeometry(QtCore.QRect(28, 10, 220, 30))
         self.title.setStyleSheet("")
         self.title.setObjectName("title")
+        self.subtitle = QtWidgets.QLabel(self.background)
+        self.subtitle.setGeometry(QtCore.QRect(28, 40, 280, 20))
+        self.subtitle.setObjectName("subtitle")
         self.pref_themes = QtWidgets.QLabel(self.centralwidget)
-        self.pref_themes.setGeometry(QtCore.QRect(10, 290, 201, 31))
+        self.pref_themes.setGeometry(QtCore.QRect(28, 576, 140, 24))
         self.pref_themes.setObjectName("pref_themes")
-        self.themesList = QtWidgets.QListWidget(self.background)
-        self.themesList.setGeometry(QtCore.QRect(10, 40, 380, 192))
+        self.themesList = QtWidgets.QListWidget(self.centralwidget)
+        self.themesList.setGeometry(QtCore.QRect(28, 608, 504, 72))
         
         # Add Audio Devices Section
-        self.audioGroupBox = QtWidgets.QGroupBox(self.background)
-        self.audioGroupBox.setGeometry(QtCore.QRect(10, 250, 380, 150))
+        self.audioGroupBox = QtWidgets.QGroupBox(self.centralwidget)
+        self.audioGroupBox.setGeometry(QtCore.QRect(28, 344, 504, 220))
         self.audioGroupBox.setObjectName("audioGroupBox")
         self.audioGroupBox.setTitle("Audio Devices")
         
         self.inputDeviceLabel = QtWidgets.QLabel(self.audioGroupBox)
-        self.inputDeviceLabel.setGeometry(QtCore.QRect(10, 30, 90, 30))
+        self.inputDeviceLabel.setGeometry(QtCore.QRect(18, 38, 80, 24))
         self.inputDeviceLabel.setText("Input:")
         
         self.inputDeviceCombo = QtWidgets.QComboBox(self.audioGroupBox)
-        self.inputDeviceCombo.setGeometry(QtCore.QRect(100, 30, 270, 30))
+        self.inputDeviceCombo.setGeometry(QtCore.QRect(110, 32, 376, 36))
         
         self.outputDeviceLabel = QtWidgets.QLabel(self.audioGroupBox)
-        self.outputDeviceLabel.setGeometry(QtCore.QRect(10, 70, 90, 30))
+        self.outputDeviceLabel.setGeometry(QtCore.QRect(18, 82, 80, 24))
         self.outputDeviceLabel.setText("Output:")
         
         self.outputDeviceCombo = QtWidgets.QComboBox(self.audioGroupBox)
-        self.outputDeviceCombo.setGeometry(QtCore.QRect(100, 70, 270, 30))
+        self.outputDeviceCombo.setGeometry(QtCore.QRect(110, 76, 376, 36))
         
         self.refreshDevicesBtn = QtWidgets.QPushButton(self.audioGroupBox)
-        self.refreshDevicesBtn.setGeometry(QtCore.QRect(10, 110, 360, 30))
+        self.refreshDevicesBtn.setGeometry(QtCore.QRect(18, 124, 468, 38))
         self.refreshDevicesBtn.setText("Refresh Devices")
-        
-        # Adjust window size if needed
-        MainWindow.resize(400, 450)  # Make window taller to accommodate new controls
-        self.themesList.setGeometry(QtCore.QRect(10, 330, 401, 161))
+
+        self.micPassthroughCheck = QtWidgets.QCheckBox(self.audioGroupBox)
+        self.micPassthroughCheck.setGeometry(QtCore.QRect(18, 170, 280, 24))
+        self.micPassthroughCheck.setObjectName("micPassthroughCheck")
+
+        self.micVolumeLabel = QtWidgets.QLabel(self.audioGroupBox)
+        self.micVolumeLabel.setGeometry(QtCore.QRect(18, 192, 90, 24))
+        self.micVolumeLabel.setObjectName("micVolumeLabel")
+
+        self.micVolumeSlider = QtWidgets.QSlider(self.audioGroupBox)
+        self.micVolumeSlider.setGeometry(QtCore.QRect(110, 188, 320, 28))
+        self.micVolumeSlider.setOrientation(QtCore.Qt.Horizontal)
+        self.micVolumeSlider.setMinimum(0)
+        self.micVolumeSlider.setMaximum(200)
+        self.micVolumeSlider.setProperty("value", 100)
+        self.micVolumeSlider.setObjectName("micVolumeSlider")
+
+        self.micVolumeValue = QtWidgets.QLabel(self.audioGroupBox)
+        self.micVolumeValue.setGeometry(QtCore.QRect(436, 192, 50, 24))
+        self.micVolumeValue.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+        self.micVolumeValue.setObjectName("micVolumeValue")
+
+        self.controlsGroupBox = QtWidgets.QGroupBox(self.centralwidget)
+        self.controlsGroupBox.setGeometry(QtCore.QRect(28, 88, 504, 244))
+        self.controlsGroupBox.setTitle("Overlay Controls")
+        self.controlsGroupBox.setObjectName("controlsGroupBox")
+        self.gridLayoutWidget.setParent(self.controlsGroupBox)
+        self.gridLayoutWidget.setGeometry(QtCore.QRect(0, 8, 504, 220))
+
         self.themesList.setObjectName("themesList")
         self.background.raise_()
         self.exit_button.raise_()
         self.min_button.raise_()
-        self.gridLayoutWidget.raise_()
+        self.controlsGroupBox.raise_()
+        self.audioGroupBox.raise_()
         self.pref_themes.raise_()
         self.themesList.raise_()
         MainWindow.setCentralWidget(self.centralwidget)
@@ -234,4 +213,8 @@ class Ui_MainWindow(object):
         self.pref_over_el1.setText(_translate("MainWindow", "Overlay menu up"))
         self.play_sound.setText(_translate("MainWindow", "PushButton"))
         self.title.setText(_translate("MainWindow", "Preferences"))
+        self.subtitle.setText(_translate("MainWindow", "Controls, devices and themes"))
         self.pref_themes.setText(_translate("MainWindow", "Themes"))
+        self.micPassthroughCheck.setText(_translate("MainWindow", "Include microphone in virtual mix"))
+        self.micVolumeLabel.setText(_translate("MainWindow", "Mic Volume"))
+        self.micVolumeValue.setText(_translate("MainWindow", "100%"))

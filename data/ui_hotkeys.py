@@ -14,123 +14,64 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(420, 468)
+        MainWindow.resize(560, 620)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
         MainWindow.setSizePolicy(sizePolicy)
-        MainWindow.setMinimumSize(QtCore.QSize(420, 468))
-        MainWindow.setMaximumSize(QtCore.QSize(420, 468))
+        MainWindow.setMinimumSize(QtCore.QSize(560, 620))
+        MainWindow.setMaximumSize(QtCore.QSize(560, 620))
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("icon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
-        MainWindow.setStyleSheet("QWidget{\n"
-"    background: rgb(44, 44, 44);    \n"
-"    font: 25 14pt \"Calibri Light\";\n"
-"}\n"
-"\n"
-"QLabel{\n"
-"    background: none\n"
-"}\n"
-"\n"
-"QPushButton{\n"
-"    background: rgb(58, 58, 58);\n"
-"    border: none;\n"
-"}\n"
-"\n"
-"QPushButton:hover{\n"
-"    background: rgb(53, 53, 53);\n"
-"}\n"
-"\n"
-"QListWidget{\n"
-"    margin: 4px;\n"
-"    border: none;\n"
-"}\n"
-"\n"
-"QListWidget::item[Custom=\"true\"]{\n"
-"    background: rgb(48, 48, 48);\n"
-"}\n"
-"\n"
-"QListWidget::item:hover{\n"
-"    background:  rgb(53, 53, 53);\n"
-"}\n"
-"\n"
-"QListWidget::item:selected{\n"
-"    background: rgb(48, 48, 48);\n"
-"    color: black;\n"
-"}\n"
-"\n"
-"QScrollBar:vertical{\n"
-"    border: 1px transparent rgb(58, 58, 58);\n"
-"    border-radius: 4px;\n"
-"    background: rgb(48, 48, 48);\n"
-"    width: 16px;\n"
-"}\n"
-"\n"
-"QScrollBar::handle:vertical{\n"
-"    background: rgb(48, 48, 48);\n"
-"}\n"
-"\n"
-"QScrollBar::sub-page:vertical{\n"
-"    background: rgb(58, 58, 58);\n"
-"}\n"
-"\n"
-"QScrollBar::add-page:vertical{\n"
-"    background: rgb(58, 58, 58);\n"
-"}\n"
-"\n"
-"#background{\n"
-"    background:rgb(48, 48, 48);\n"
-"}\n"
-"\n"
-"#exit_button{\n"
-"    margin-bottom: 1px;\n"
-"}\n"
-"\n"
-"#exit_button:hover{\n"
-"    color: black;\n"
-"    background: rgba(254, 119, 122, 128);\n"
-"}\n"
-"\n"
-"#min_button{\n"
-"    margin-bottom: 1px;\n"
-"}\n"
-"\n"
-"#min_button:hover{\n"
-"    color: black;\n"
-"    background: rgba(194, 213, 254, 128);\n"
-"}\n"
-"\n"
-"#delete_button:hover{\n"
-"    color: black;\n"
-"    background: rgba(254, 119, 122, 128);\n"
-"}")
+        MainWindow.setStyleSheet("QWidget{background:#151821;color:#f5f7fb;font:11pt \"Segoe UI\";}\n"
+"QPushButton{background:#2b3245;border:1px solid #3d4963;border-radius:12px;padding:10px 14px;font-weight:600;}\n"
+"QPushButton:hover{background:#36415b;}\n"
+"QListWidget{background:#171c2b;border:1px solid #252d41;border-radius:20px;padding:12px;outline:none;}\n"
+"QListWidget::item{padding:12px 14px;border-radius:12px;margin:2px 0;}\n"
+"QListWidget::item:hover{background:#2a3449;}\n"
+"QListWidget::item:selected{background:#6d7cff;color:white;}\n"
+"QLabel{background:transparent;}\n"
+"QScrollBar:vertical{background:transparent;width:12px;margin:4px;}\n"
+"QScrollBar::handle:vertical{background:#36415b;border-radius:6px;min-height:24px;}\n"
+"QScrollBar::add-line:vertical,QScrollBar::sub-line:vertical,QScrollBar::add-page:vertical,QScrollBar::sub-page:vertical{background:none;border:none;}\n"
+"#background{background:#101522;border-bottom:1px solid #252d41;}\n"
+"#title{font:700 18pt \"Segoe UI Semibold\";}\n"
+"#subtitle{color:#98a4bf;font:10pt \"Segoe UI\";}\n"
+"#delete_button{background:#4a1f28;border:1px solid #683544;color:#ffe5ea;}\n"
+"#delete_button:hover{background:#5c2631;}\n"
+"#exit_button,#min_button{background:transparent;border:none;border-radius:12px;padding:8px 12px;}\n"
+"#min_button:hover{background:#20283a;}\n"
+"#exit_button:hover{background:#4a1f28;color:#ffd7dd;}")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.exit_button = QtWidgets.QPushButton(self.centralwidget)
-        self.exit_button.setGeometry(QtCore.QRect(380, 0, 41, 31))
+        self.exit_button.setGeometry(QtCore.QRect(506, 12, 40, 40))
         self.exit_button.setStyleSheet("")
         self.exit_button.setObjectName("exit_button")
         self.min_button = QtWidgets.QPushButton(self.centralwidget)
-        self.min_button.setGeometry(QtCore.QRect(340, 0, 41, 31))
+        self.min_button.setGeometry(QtCore.QRect(460, 12, 40, 40))
         self.min_button.setStyleSheet("")
         self.min_button.setObjectName("min_button")
         self.title = QtWidgets.QLabel(self.centralwidget)
-        self.title.setGeometry(QtCore.QRect(20, 40, 291, 20))
+        self.title.setGeometry(QtCore.QRect(28, 18, 220, 28))
         self.title.setStyleSheet("background: none;\n"
 "")
         self.title.setObjectName("title")
+        self.subtitle = QtWidgets.QLabel(self.centralwidget)
+        self.subtitle.setGeometry(QtCore.QRect(28, 46, 280, 20))
+        self.subtitle.setObjectName("subtitle")
         self.background = QtWidgets.QWidget(self.centralwidget)
-        self.background.setGeometry(QtCore.QRect(0, 0, 421, 71))
+        self.background.setGeometry(QtCore.QRect(0, 0, 560, 76))
         self.background.setStyleSheet("")
         self.background.setObjectName("background")
         self.hotkeyList = QtWidgets.QListWidget(self.centralwidget)
-        self.hotkeyList.setGeometry(QtCore.QRect(0, 70, 421, 351))
+        self.hotkeyList.setGeometry(QtCore.QRect(28, 96, 504, 452))
         self.hotkeyList.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.hotkeyList.setObjectName("hotkeyList")
         self.delete_button = QtWidgets.QPushButton(self.centralwidget)
-        self.delete_button.setGeometry(QtCore.QRect(0, 420, 101, 51))
+        self.delete_button.setGeometry(QtCore.QRect(28, 562, 160, 40))
         self.delete_button.setStyleSheet("")
         self.delete_button.setObjectName("delete_button")
         self.background.raise_()
@@ -150,4 +91,5 @@ class Ui_MainWindow(object):
         self.exit_button.setText(_translate("MainWindow", "X"))
         self.min_button.setText(_translate("MainWindow", "-"))
         self.title.setText(_translate("MainWindow", "Hotkeys"))
+        self.subtitle.setText(_translate("MainWindow", "Assigned shortcuts for your sounds"))
         self.delete_button.setText(_translate("MainWindow", "Delete"))

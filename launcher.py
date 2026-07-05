@@ -1,7 +1,11 @@
 import os
 import sys
 from cryptography.fernet import Fernet
-import key
+
+try:
+    import key
+except ModuleNotFoundError:
+    key = None
 
 ### Добавь здесь модули нужные твоей программе ###
 import pygame
@@ -41,6 +45,8 @@ if __name__ == '__main__':
         with open(os.path.join('data', 'main.py'), 'r', encoding='utf-8') as f:
             exec(f.read(), namespace)
     else:
+        if key is None:
+            raise ModuleNotFoundError("Missing 'key' module required for encrypted runtime")
         exec(decrypt(os.path.join('data', 'sundpood-runtime.sr'), key.KEY), namespace)
     
     sys.exit(app.exec_())

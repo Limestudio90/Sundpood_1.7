@@ -1,55 +1,245 @@
-
-#background{
-	background:rgb(48, 48, 48);
+QWidget {
+    background: #121722;
+    color: #f3f6fb;
+    font: 11pt "Segoe UI";
 }
 
-QWidget{
-	background: rgb(44, 44, 44);	
-	font: 25 14pt "Calibri Light";
+QLabel {
+    background: transparent;
 }
 
-QPushButton{
-	background: rgb(58, 58, 58);
-	border: none;
+QPushButton {
+    background: #273046;
+    border: 1px solid #36405a;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font: 600 10pt "Segoe UI";
 }
 
-QPushButton:hover{
-	background: rgb(53, 53, 53);
+QPushButton:hover {
+    background: #313b55;
 }
 
-QListWidget{
-	margin: 4px;
-	border: none;
+QPushButton:pressed {
+    background: #1e2638;
 }
 
-QListWidget::item[Custom="true"]{
-	background: rgb(48, 48, 48);
+QListWidget {
+    background: #171d2a;
+    border: 1px solid #283147;
+    border-radius: 16px;
+    padding: 10px;
+    outline: none;
 }
 
-QListWidget::item:hover{
-	background:  rgb(53, 53, 53);
+QListWidget::item {
+    padding: 10px 12px;
+    border-radius: 10px;
+    margin: 2px 0;
 }
 
-QListWidget::item:selected{
-	background: rgb(48, 48, 48);
-	color: black;
+QListWidget::item:hover {
+    background: #273149;
 }
 
-QScrollBar:vertical{
-	border: 1px transparent rgb(58, 58, 58);
-	border-radius: 4px;
-	background: rgb(48, 48, 48);
-	width: 16px;
+QListWidget::item:selected {
+    background: #5e74ff;
+    color: white;
 }
 
-QScrollBar::handle:vertical{
-	background: rgb(48, 48, 48);
+QGroupBox {
+    background: #171d2a;
+    border: 1px solid #283147;
+    border-radius: 20px;
+    margin-top: 18px;
+    padding-top: 18px;
+    font: 700 10pt "Segoe UI Semibold";
 }
 
-QScrollBar::sub-page:vertical{
-	background: rgb(58, 58, 58);
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 16px;
+    padding: 0 6px;
+    color: #d2daec;
 }
 
-QScrollBar::add-page:vertical{
-	background: rgb(58, 58, 58);
+QComboBox {
+    background: #171d2a;
+    border: 1px solid #313b52;
+    border-radius: 12px;
+    padding: 8px 12px;
+}
+
+QComboBox QAbstractItemView {
+    background: #171d2a;
+    border: 1px solid #313b52;
+    selection-background-color: #5e74ff;
+}
+
+QCheckBox {
+    spacing: 10px;
+}
+
+QCheckBox::indicator {
+    width: 18px;
+    height: 18px;
+}
+
+QCheckBox::indicator:unchecked {
+    border: 1px solid #495572;
+    border-radius: 6px;
+    background: #171d2a;
+}
+
+QCheckBox::indicator:checked {
+    border: 1px solid #5e74ff;
+    border-radius: 6px;
+    background: #5e74ff;
+}
+
+QSlider::groove:horizontal {
+    height: 8px;
+    background: #253049;
+    border-radius: 4px;
+}
+
+QSlider::sub-page:horizontal {
+    background: #5e74ff;
+    border-radius: 4px;
+}
+
+QSlider::add-page:horizontal {
+    background: #253049;
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+    background: #eef2ff;
+    border: 2px solid #5e74ff;
+    width: 18px;
+    height: 18px;
+    margin: -6px 0;
+    border-radius: 9px;
+}
+
+QScrollBar:vertical {
+    background: transparent;
+    width: 12px;
+    margin: 4px;
+}
+
+QScrollBar::handle:vertical {
+    background: #36415b;
+    border-radius: 6px;
+    min-height: 24px;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical,
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+    background: none;
+    border: none;
+}
+
+#background,
+#headerStrip {
+    background: #0d1220;
+    border-bottom: 1px solid #222b41;
+}
+
+#sidebarCard,
+#contentCard {
+    background: #151b29;
+    border: 1px solid #222b41;
+    border-radius: 24px;
+}
+
+#overlayCard {
+    background: rgba(13, 18, 32, 230);
+    border: 1px solid rgba(77, 93, 128, 180);
+    border-radius: 18px;
+}
+
+#select_label {
+    background: #0f1522;
+    border: 1px solid #26304a;
+    border-radius: 16px;
+    color: #eef2ff;
+    padding: 10px 16px;
+    font: 700 11pt "Segoe UI Semibold";
+}
+
+#app_title,
+#title {
+    font: 700 18pt "Segoe UI Semibold";
+    color: #ffffff;
+}
+
+#app_subtitle,
+#subtitle,
+#volume_hint,
+#library_hint {
+    color: #9ba7c0;
+    font: 10pt "Segoe UI";
+}
+
+#label {
+    font: 700 11pt "Segoe UI Semibold";
+}
+
+#cat_label,
+#library_label,
+#volume_label,
+#pref_themes {
+    font: 700 10pt "Segoe UI Semibold";
+    color: #d2daec;
+}
+
+#play_button {
+    background: #5e74ff;
+    border: 1px solid #7285ff;
+    color: white;
+}
+
+#play_button:hover {
+    background: #7184ff;
+}
+
+#hkset {
+    background: #1e9076;
+    border: 1px solid #24aa8a;
+    color: white;
+}
+
+#hkset:hover {
+    background: #24a186;
+}
+
+#delete_button {
+    background: #4f2230;
+    border: 1px solid #713849;
+    color: #ffe5ea;
+}
+
+#delete_button:hover,
+#exit_button:hover {
+    background: #632b38;
+    color: #ffd7dd;
+}
+
+#pref_button,
+#hotkeys_button,
+#min_button,
+#exit_button {
+    background: transparent;
+    border: none;
+    border-radius: 12px;
+    padding: 8px 12px;
+}
+
+#pref_button:hover,
+#hotkeys_button:hover,
+#min_button:hover {
+    background: #1f2739;
 }

@@ -1,1 +1,6 @@
 key.py
+__pycache__/
+data/__pycache__/
+.vscode/
+settings.json
+sound/ReelAudio-33657.mp3

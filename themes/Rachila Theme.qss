@@ -1,120 +1,247 @@
-QWidget{
-    background: rgb(70, 54, 80);    
-    font: 25 14pt \"Calibri Light\";
+QWidget {
+    background: #3d2e4a;
+    color: #fff4fb;
+    font: 11pt "Segoe UI";
 }
 
-QLabel{
-    background: none;
+QLabel {
+    background: transparent;
 }
 
-QPushButton{
-    color: rgb(35, 17, 22);
-    background: rgb(237, 120, 153);
-    border: none;
+QPushButton {
+    color: #fff4fb;
+    background: #ed7899;
+    border: 1px solid #f49eb6;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font: 600 10pt "Segoe UI";
 }
 
-QPushButton:hover{
-    background: rgb(182, 92, 118);
+QPushButton:hover {
+    background: #f08aa8;
 }
 
-QListWidget{
-    margin: 4px;
-    border: none;
+QPushButton:pressed {
+    background: #dd6b8c;
 }
-QListWidget::item[Custom=\"true\"]{
-    background: rgb(48, 48, 48);
+
+QListWidget {
+    background: #4a3659;
+    border: 1px solid #6a4f7d;
+    border-radius: 16px;
+    padding: 10px;
+    outline: none;
 }
-QListWidget::item:hover{
-    background: rgb(182, 92, 118);
+
+QListWidget::item {
+    padding: 10px 12px;
+    border-radius: 10px;
+    margin: 2px 0;
 }
-QListWidget::item:selected{
-    background: rgb(47, 41, 50);
+
+QListWidget::item:hover {
+    background: #b95c76;
+}
+
+QListWidget::item:selected {
+    background: #2d2235;
     color: white;
 }
 
-QScrollBar:vertical{
-    border: 1px transparent rgb(237, 120, 153);
-    border-radius: 4px;
-    background: rgb(48, 48, 48);
-    width: 16px;
+QGroupBox {
+    background: #4a3659;
+    border: 1px solid #6a4f7d;
+    border-radius: 20px;
+    margin-top: 18px;
+    padding-top: 18px;
+    font: 700 10pt "Segoe UI Semibold";
 }
-QScrollBar::handle:vertical{
-    background: rgb(48, 48, 48);
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 16px;
+    padding: 0 6px;
+    color: #ffd7e5;
 }
-QScrollBar::sub-page:vertical{
-    background: rgb(188, 87, 116);
+
+QComboBox {
+    background: #4a3659;
+    border: 1px solid #7b5e90;
+    border-radius: 12px;
+    padding: 8px 12px;
 }
-QScrollBar::add-page:vertical{
-    background: rgb(99, 70, 114);
+
+QComboBox QAbstractItemView {
+    background: #4a3659;
+    border: 1px solid #7b5e90;
+    selection-background-color: #ed7899;
+}
+
+QCheckBox {
+    spacing: 10px;
+}
+
+QCheckBox::indicator {
+    width: 18px;
+    height: 18px;
+}
+
+QCheckBox::indicator:unchecked {
+    border: 1px solid #b88bc8;
+    border-radius: 6px;
+    background: #4a3659;
+}
+
+QCheckBox::indicator:checked {
+    border: 1px solid #ed7899;
+    border-radius: 6px;
+    background: #ed7899;
 }
 
 QSlider::groove:horizontal {
-    border: none;
-    background: none;
-    height: 40px;
-    margin: -1px;
+    height: 8px;
+    background: #6b4f7a;
+    border-radius: 4px;
 }
-QSlider::handle:horizontal {
-    background-color: rgb(237, 120, 153);
-    border: none;
-    height: 40px;
-    width: 40px;
-    margin: -15px 0px;
-}
+
 QSlider::sub-page:horizontal {
-    border: none;
-    height: 40px;
-    background: rgb(188, 87, 116);
+    background: #ed7899;
+    border-radius: 4px;
 }
+
 QSlider::add-page:horizontal {
+    background: #6b4f7a;
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+    background: #fff4fb;
+    border: 2px solid #ed7899;
+    width: 18px;
+    height: 18px;
+    margin: -6px 0;
+    border-radius: 9px;
+}
+
+QScrollBar:vertical {
+    background: transparent;
+    width: 12px;
+    margin: 4px;
+}
+
+QScrollBar::handle:vertical {
+    background: #89659a;
+    border-radius: 6px;
+    min-height: 24px;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical,
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+    background: none;
     border: none;
-    height: 40px;
-    background: rgb(99, 70, 114);
 }
 
-#background{
-    background: rgb(146, 111, 163);
+#background,
+#headerStrip {
+    background: #5b446d;
+    border-bottom: 1px solid #775b8b;
 }
 
-#exit_button{
-    margin-bottom: 1px;
+#sidebarCard,
+#contentCard {
+    background: #4a3659;
+    border: 1px solid #6a4f7d;
+    border-radius: 24px;
 }
 
-#min_button{
-    margin-bottom: 1px;
+#overlayCard {
+    background: rgba(47, 34, 56, 232);
+    border: 1px solid rgba(172, 115, 193, 180);
+    border-radius: 18px;
 }
 
-#pref_button{
-    background: none;
-    margin-bottom: 1px;
-}
-#pref_button:hover{
-    background: rgba(70, 54, 80, 128);
-}
-
-#hotkeys_button{
-    background: none;
-    margin-bottom: 1px;
-}
-#hotkeys_button:hover{
-    background: rgba(70, 54, 80, 128);
+#select_label {
+    background: #2f2238;
+    border: 1px solid #7a5a8d;
+    border-radius: 16px;
+    color: #ffd7e5;
+    padding: 10px 16px;
+    font: 700 11pt "Segoe UI Semibold";
 }
 
-#select_label{
-    background: rgb(32, 25, 36);
-    color: rgb(237, 120, 153);
+#app_title,
+#title {
+    font: 700 18pt "Segoe UI Semibold";
+    color: #ffd7e5;
 }
 
-#catList::item{
-    padding: 6px;
+#app_subtitle,
+#subtitle,
+#volume_hint,
+#library_hint {
+    color: #f1c8d8;
+    font: 10pt "Segoe UI";
 }
 
-#title{
-    color: rgb(237, 120, 153);
+#label {
+    font: 700 11pt "Segoe UI Semibold";
 }
-#pref_over{
-    color: rgb(237, 120, 153);
+
+#cat_label,
+#library_label,
+#volume_label,
+#pref_over,
+#pref_themes {
+    font: 700 10pt "Segoe UI Semibold";
+    color: #ffd7e5;
 }
-#pref_themes{
-    color: rgb(237, 120, 153);
+
+#play_button {
+    background: #ed7899;
+    border: 1px solid #f49eb6;
+    color: white;
+}
+
+#play_button:hover {
+    background: #f08aa8;
+}
+
+#hkset {
+    background: #a55bd6;
+    border: 1px solid #bb83e1;
+    color: white;
+}
+
+#hkset:hover {
+    background: #b36fe0;
+}
+
+#delete_button {
+    background: #7f2f48;
+    border: 1px solid #a55a73;
+    color: #ffe7ee;
+}
+
+#delete_button:hover,
+#exit_button:hover {
+    background: #943750;
+    color: #fff0f5;
+}
+
+#pref_button,
+#hotkeys_button,
+#min_button,
+#exit_button {
+    background: transparent;
+    border: none;
+    border-radius: 12px;
+    padding: 8px 12px;
+}
+
+#pref_button:hover,
+#hotkeys_button:hover,
+#min_button:hover {
+    background: rgba(47, 34, 56, 0.75);
 }

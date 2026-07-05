@@ -14,22 +14,25 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(300, 30)
-        MainWindow.setMinimumSize(QtCore.QSize(300, 30))
-        MainWindow.setMaximumSize(QtCore.QSize(300, 30))
+        MainWindow.resize(360, 56)
+        MainWindow.setMinimumSize(QtCore.QSize(360, 56))
+        MainWindow.setMaximumSize(QtCore.QSize(360, 56))
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("icon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
-        MainWindow.setWindowOpacity(0.5)
+        MainWindow.setWindowOpacity(0.88)
         MainWindow.setToolTipDuration(5)
-        MainWindow.setStyleSheet("\n"
-"font: 75 14pt \"Calibri\";\n"
-"color: white;\n"
-"background-color: black;")
+        MainWindow.setStyleSheet("QWidget{background:transparent;color:#f5f7fb;font:11pt \"Segoe UI\";}\n"
+"#overlayCard{background:rgba(16, 21, 34, 230);border:1px solid rgba(84, 98, 130, 180);border-radius:18px;}\n"
+"#label{padding:0 16px;font:700 11pt \"Segoe UI Semibold\";}")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(0, 0, 301, 31))
+        self.overlayCard = QtWidgets.QWidget(self.centralwidget)
+        self.overlayCard.setGeometry(QtCore.QRect(0, 0, 360, 56))
+        self.overlayCard.setObjectName("overlayCard")
+        self.label = QtWidgets.QLabel(self.overlayCard)
+        self.label.setGeometry(QtCore.QRect(0, 0, 360, 56))
+        self.label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
         self.label.setObjectName("label")
         MainWindow.setCentralWidget(self.centralwidget)
 

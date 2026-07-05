@@ -1,23 +1,30 @@
-#\ SundPood version 0201 /#
+#\ SundPood version 2.0 /#
 
 import os
 import sys
 import json
+import re
+import shutil
 from time import time
+import numpy as np
 import pygame as pg
 import sounddevice as sd
 from pynput.keyboard import Listener
 from cryptography.fernet import Fernet
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtCore import QFile, QTextStream
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QFileDialog
 from data import ui_preferences
 from data import ui_hotkeys
 from data import ui_sundpood
 from data import ui_overlay
 from data import keys
 import themes
-import key
+
+try:
+    import key
+except ModuleNotFoundError:
+    key = None
 
 
 ###! UI !###
@@ -25,7 +32,7 @@ class OverlayUi(QtWidgets.QMainWindow, ui_overlay.Ui_MainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint)
-        self.setGeometry(QtCore.QRect(0, 0, 250, 20))
+        self.setGeometry(QtCore.QRect(0, 0, 360, 56))
         self.setupUi(self)
 
     def keyPressEvent(self, e):
@@ -96,6 +103,7 @@ class MainUi(QtWidgets.QMainWindow, ui_sundpood.Ui_MainWindow):
 
     def closeEvent(self, event):
         save()
+        stop_microphone_passthrough()
         if os.path.exists('.play'):
             os.remove('.play')
         hotk.close()
@@ -143,27 +151,138 @@ def toggle_stylesheet(path):
         print(f"Theme loading error: {e}")
 
 if __name__ == '__main__':
-    def find_device():
+    app_ready_for_save = False
+    mic_passthrough_stream = None
+    mic_passthrough_volume = 1.0
+    PREFERRED_INPUT_KEYWORDS = [
+        'microfono',
+        'microphone',
+        'mic',
+        'insta360',
+    ]
+    PREFERRED_OUTPUT_KEYWORDS = [
+        'virtual audio cable',
+        'line 1',
+        'line 2',
+        'line 3',
+        'cable input',
+        'voicemeeter input',
+    ]
+    DEFAULT_AUDIO_SETTINGS = {
+        'input': '',
+        'output': '',
+        'mic_passthrough_enabled': True,
+        'mic_volume': 100,
+    }
+
+    def get_audio_settings():
+        if not os.path.exists(config):
+            return DEFAULT_AUDIO_SETTINGS.copy()
+
+        try:
+            config_data = jsonread(config)
+        except (json.JSONDecodeError, KeyError, TypeError):
+            return DEFAULT_AUDIO_SETTINGS.copy()
+        saved_audio = config_data.get('audio_devices', {})
+        audio_settings = DEFAULT_AUDIO_SETTINGS.copy()
+        audio_settings.update(saved_audio)
+        return audio_settings
+
+    def find_input_device(preferred_name=''):
         '''
-        Ищем устройство device и возвращаем его индекс
+        Возвращает имя устройства ввода звука.
+        Сначала пытается найти сохраненное устройство, затем предпочитает
+        физический микрофон, после этого использует первый доступный input.
         '''
-    
-        list_ = list(sd.query_devices())    # Список устройств вывода звука
-        device = ["CABLE Input (VB-Audio Virtual Cable)", 
-                "VoiceMeeter Input (VB-Audio VoiceMeeter VAIO)"]# Имя искомого устройства
-    
-        msg = QtWidgets.QMessageBox()       # Окно ошибки (Устройство не найдено)
+        devices = list(sd.query_devices())
+        input_devices = [device for device in devices if device['max_input_channels'] > 0]
+        preferred_name = (preferred_name or '').strip().lower()
+
+        if preferred_name:
+            for device in input_devices:
+                if preferred_name == device['name'].strip().lower():
+                    return device['name']
+
+        for keyword in PREFERRED_INPUT_KEYWORDS:
+            for device in input_devices:
+                device_name = device['name'].lower()
+                if keyword in device_name and 'cable output' not in device_name and 'loopback' not in device_name:
+                    return device['name']
+
+        for device in input_devices:
+            device_name = device['name'].lower()
+            if 'cable output' not in device_name and 'loopback' not in device_name and 'sound mapper' not in device_name:
+                return device['name']
+
+        if input_devices:
+            return input_devices[0]['name']
+
+        return ''
+
+    def find_output_device(preferred_name=''):
+        '''
+        Возвращает имя устройства вывода звука.
+        Сначала пытается найти сохраненное устройство, затем предпочитает
+        Virtual Audio Cable, после этого использует первый доступный output.
+        '''
+        devices = list(sd.query_devices())
+        output_devices = [device for device in devices if device['max_output_channels'] > 0]
+        preferred_name = (preferred_name or '').strip().lower()
+
+        if preferred_name:
+            for device in output_devices:
+                if preferred_name == device['name'].strip().lower():
+                    return device['name']
+
+        for keyword in PREFERRED_OUTPUT_KEYWORDS:
+            for device in output_devices:
+                if keyword in device['name'].lower():
+                    return device['name']
+
+        if output_devices:
+            return output_devices[0]['name']
+
+        msg = QtWidgets.QMessageBox()
         msg.setIcon(QtWidgets.QMessageBox.Critical)
-        msg.setText("You don't install VoiceMeeter")
-        msg.setInformativeText('install VoiceMetter from "redist" folder or download it from \nvb-audio.com/Voicemeeter')
+        msg.setText("No output audio device found")
+        msg.setInformativeText(
+            "Install or enable an output device such as Virtual Audio Cable, "
+            "then restart SundPood."
+        )
         msg.setWindowTitle('Error')
-    
-        for i in list_:
-            for d in device:
-                if d in i['name']:
-                    return i['name']
         msg.exec_()
-        exit()
+        sys.exit(1)
+
+    def normalize_device_name(name):
+        normalized = (name or '').strip().lower()
+        normalized = re.sub(r'\s+', ' ', normalized)
+        normalized = normalized.replace('(', '').replace(')', '')
+        normalized = normalized.replace('-', ' ')
+        return normalized
+
+    def get_pygame_output_name(output_name):
+        if not output_name:
+            return ''
+
+        try:
+            import pygame._sdl2.audio as sdl2_audio
+            pg.init()
+            pygame_outputs = list(sdl2_audio.get_audio_device_names(False))
+        except Exception:
+            return output_name
+
+        normalized_target = normalize_device_name(output_name)
+
+        for pygame_name in pygame_outputs:
+            if pygame_name == output_name:
+                return pygame_name
+
+        for pygame_name in pygame_outputs:
+            normalized_pygame = normalize_device_name(pygame_name)
+            if normalized_target in normalized_pygame or normalized_pygame in normalized_target:
+                return pygame_name
+
+        return output_name
 
     def get_files(dir_, config):
         '''
@@ -176,6 +295,7 @@ if __name__ == '__main__':
         msg.setText("You don't have any sounds in 'sound' folder")
         msg.setInformativeText('download sound in .wav / .mp3 / .m4a format')
         msg.setWindowTitle('Error')
+        supported_extensions = {'.mp3', '.m4a', '.wav', '.ogg'}
     
         if os.path.exists(dir_):
             if len(os.listdir(dir_)) == 0:
@@ -184,39 +304,39 @@ if __name__ == '__main__':
             sounds = []                     # Все аудио файлы
             sounds_list = [f'{dir_}\\']       # Начальная категория
     
-            for i in os.listdir(dir_):
-                if os.path.isfile(os.path.join(dir_, i)):
-                    name = os.path.join(dir_, i)
-                    if name == None:
+            for i in sorted(os.listdir(dir_)):
+                full_path = os.path.join(dir_, i)
+                if os.path.isfile(full_path):
+                    if os.path.splitext(i)[1].lower() in supported_extensions:
                         sounds_list.append(i)
-                    elif os.path.splitext(i)[1] in ['.mp3', '.m4a', '.wav']:
-                        sounds_list.append(i)
-                else:
-                    sounds_list_cat = [os.path.join(dir_, i)]
-                    for x in os.listdir(os.path.join(dir_, i)):
-                        if name == None:
-                            sounds_list_cat.append(x)
-                        elif os.path.splitext(x)[1] in ['.mp3', '.m4a', '.wav']:
-                            sounds_list_cat.append(x)
+                elif os.path.isdir(full_path):
+                    sounds_list_cat = [full_path]
+                    for root, _, files in os.walk(full_path):
+                        for file_name in sorted(files):
+                            if os.path.splitext(file_name)[1].lower() not in supported_extensions:
+                                continue
+                            file_path = os.path.join(root, file_name)
+                            relative_path = os.path.relpath(file_path, full_path)
+                            sounds_list_cat.append(relative_path)
                     sounds.append(sounds_list_cat)
             sounds.append(sounds_list)
     
             if os.path.exists(config):
-                hotkeys = jsonread(config)['hotkeys']
-                theme = jsonread(config)['Theme']
-                KEYS_CMD = jsonread(config)['KEYS_CMD']
+                config_data = jsonread(config)
+                hotkeys = config_data['hotkeys']
+                theme = config_data['Theme']
+                KEYS_CMD = config_data['KEYS_CMD']
+                audio_devices = get_audio_settings()
                 sounds_list = { 'hotkeys':hotkeys, 
                                 'sounds':sounds,
                                 'Theme':theme,
+                                'audio_devices': audio_devices,
                                 'KEYS_CMD':KEYS_CMD}
             else:
                 sounds_list = { 'hotkeys':{}, 
                                 'sounds':sounds,
                                 'Theme':'None',
-                                'audio_devices': {
-                                    'input': '',
-                                    'output': ''
-                                },
+                                'audio_devices': DEFAULT_AUDIO_SETTINGS.copy(),
                                 'KEYS_CMD':{
                                 'select_move_up'    :' ',# вверх
                                 'select_move_down'  :' ',# вниз
@@ -231,6 +351,7 @@ if __name__ == '__main__':
             sounds_list = { 'hotkeys':{}, 
                             'sounds':'',
                             'Theme':'None',
+                            'audio_devices': DEFAULT_AUDIO_SETTINGS.copy(),
                             'KEYS_CMD':{
                                 'select_move_up'    :' ',# вверх
                                 'select_move_down'  :' ',# вниз
@@ -243,8 +364,268 @@ if __name__ == '__main__':
             os.mkdir(dir_)
             msg.exec_()
 
+    def rebuild_hotkey_list():
+        hotk.hotkeyList.clear()
+        for category in sound_get_dict['sounds']:
+            for item in category[1:]:
+                sound_path = os.path.join(category[0], item)
+                if sound_path in hotkeys.values():
+                    hotk.hotkeyList.addItem(f'{find_key(hotkeys, sound_path)}\t: {sound_path}')
+
+    def rebuild_category_list():
+        current_category = win.catList.currentItem().text() if win.catList.currentItem() else ''
+        win.catList.clear()
+
+        for category in menu:
+            label = category[0].replace('sound', '')
+            win.catList.addItem(label)
+
+        if win.catList.count() == 0:
+            win.soundList.clear()
+            win.select_label.setText('')
+            return
+
+        target_category = current_category if current_category else win.catList.item(0).text()
+        matching_items = win.catList.findItems(target_category, QtCore.Qt.MatchExactly)
+        if matching_items:
+            win.catList.setCurrentItem(matching_items[0])
+            cat_select(matching_items[0].text())
+        else:
+            win.catList.setCurrentRow(0)
+            cat_select(win.catList.item(0).text())
+
+    def refresh_sound_library(show_message=False):
+        global sound_get_dict
+        global hotkeys
+        global theme
+        global menu
+        global select
+
+        get_files(dir_, config)
+        sound_get_dict = jsonread(config)
+        hotkeys = sound_get_dict['hotkeys']
+        theme = sound_get_dict['Theme']
+        menu = sound_get_dict['sounds']
+        select = [0, 0]
+
+        rebuild_category_list()
+        rebuild_hotkey_list()
+
+        if menu and len(menu[0]) > 1:
+            over.label.setText(menu[0][1])
+            win.select_label.setText(menu[0][1])
+        else:
+            over.label.setText('')
+            win.select_label.setText('')
+
+        if show_message:
+            msg = QtWidgets.QMessageBox()
+            msg.setIcon(QtWidgets.QMessageBox.Information)
+            msg.setText("Library refreshed")
+            msg.setInformativeText("The sound library has been reloaded from the 'sound' folder.")
+            msg.setWindowTitle('Library')
+            msg.exec_()
+
+    def import_sound_folder():
+        source_dir = QFileDialog.getExistingDirectory(
+            win,
+            'Select folder to import',
+            os.getcwd()
+        )
+        if not source_dir:
+            return
+
+        destination_root = os.path.join(dir_, os.path.basename(os.path.normpath(source_dir)))
+        os.makedirs(destination_root, exist_ok=True)
+        supported_extensions = {'.mp3', '.m4a', '.wav', '.ogg'}
+        imported_count = 0
+
+        for root, _, files in os.walk(source_dir):
+            relative_root = os.path.relpath(root, source_dir)
+            destination_dir = destination_root if relative_root == '.' else os.path.join(destination_root, relative_root)
+            os.makedirs(destination_dir, exist_ok=True)
+
+            for file_name in files:
+                if os.path.splitext(file_name)[1].lower() not in supported_extensions:
+                    continue
+                source_file = os.path.join(root, file_name)
+                destination_file = os.path.join(destination_dir, file_name)
+                shutil.copy2(source_file, destination_file)
+                imported_count += 1
+
+        refresh_sound_library()
+
+        msg = QtWidgets.QMessageBox()
+        msg.setIcon(QtWidgets.QMessageBox.Information)
+        msg.setText("Folder imported")
+        msg.setInformativeText(f"Imported {imported_count} audio file(s) into '{destination_root}'.")
+        msg.setWindowTitle('Library')
+        msg.exec_()
+
     def change_volume(value):
         pg.mixer.music.set_volume(value/100)
+
+    def stop_sound():
+        pg.mixer.music.stop()
+
+    def set_microphone_volume(value):
+        global mic_passthrough_volume
+        mic_passthrough_volume = max(0.0, float(value) / 100.0)
+
+        if hasattr(pref, 'micVolumeValue'):
+            pref.micVolumeValue.setText(f"{int(value)}%")
+        if hasattr(pref, 'micVolumeSlider'):
+            pref.micVolumeSlider.setEnabled(pref.micPassthroughCheck.isChecked())
+
+        if app_ready_for_save:
+            save()
+
+    def stop_microphone_passthrough():
+        global mic_passthrough_stream
+        if mic_passthrough_stream is not None:
+            try:
+                mic_passthrough_stream.stop()
+                mic_passthrough_stream.close()
+            except Exception:
+                pass
+            mic_passthrough_stream = None
+
+    def get_device_candidates(device_name, wants_input):
+        if not device_name:
+            return []
+
+        candidates = []
+        for index, device in enumerate(sd.query_devices()):
+            if wants_input and device['max_input_channels'] <= 0:
+                continue
+            if not wants_input and device['max_output_channels'] <= 0:
+                continue
+            if device['name'] == device_name:
+                candidates.append((index, device))
+
+        if candidates:
+            return candidates
+
+        lowered_name = device_name.lower()
+        for index, device in enumerate(sd.query_devices()):
+            if wants_input and device['max_input_channels'] <= 0:
+                continue
+            if not wants_input and device['max_output_channels'] <= 0:
+                continue
+            if lowered_name in device['name'].lower() or device['name'].lower() in lowered_name:
+                candidates.append((index, device))
+
+        return candidates
+
+    def get_duplex_device_pairs(input_name, output_name):
+        input_candidates = get_device_candidates(input_name, True)
+        output_candidates = get_device_candidates(output_name, False)
+
+        if not input_candidates or not output_candidates:
+            return []
+
+        exact_pair = []
+        same_hostapi_pairs = []
+        fallback_pairs = []
+
+        selected_input_idx = pref.inputDeviceCombo.currentData() if hasattr(pref, 'inputDeviceCombo') else None
+        selected_output_idx = pref.outputDeviceCombo.currentData() if hasattr(pref, 'outputDeviceCombo') else None
+
+        for input_idx, input_device in input_candidates:
+            for output_idx, output_device in output_candidates:
+                pair = (input_idx, output_idx, input_device, output_device)
+                if input_idx == selected_input_idx and output_idx == selected_output_idx:
+                    exact_pair.append(pair)
+                elif input_device['hostapi'] == output_device['hostapi']:
+                    same_hostapi_pairs.append(pair)
+                else:
+                    fallback_pairs.append(pair)
+
+        return exact_pair + same_hostapi_pairs + fallback_pairs
+
+    def start_microphone_passthrough(input_idx=None, output_idx=None):
+        global mic_passthrough_stream
+
+        stop_microphone_passthrough()
+
+        if input_idx is None or output_idx is None:
+            return
+
+        input_name = pref.inputDeviceCombo.currentText() if hasattr(pref, 'inputDeviceCombo') else ''
+        output_name = pref.outputDeviceCombo.currentText() if hasattr(pref, 'outputDeviceCombo') else ''
+        device_pairs = get_duplex_device_pairs(input_name, output_name)
+
+        if not device_pairs:
+            device_pairs = [(input_idx, output_idx, sd.query_devices(input_idx), sd.query_devices(output_idx))]
+
+        last_error = None
+        for candidate_input_idx, candidate_output_idx, input_device, output_device in device_pairs:
+            input_channels = max(1, min(int(input_device['max_input_channels']), 2))
+            output_channels = max(1, min(int(output_device['max_output_channels']), 2))
+            stream_channels = min(input_channels, output_channels)
+
+            if stream_channels <= 0:
+                continue
+
+            sample_rates = []
+            for rate in (
+                int(output_device.get('default_samplerate', 44100) or 44100),
+                int(input_device.get('default_samplerate', 44100) or 44100),
+                48000,
+                44100,
+            ):
+                if rate not in sample_rates:
+                    sample_rates.append(rate)
+
+            for samplerate in sample_rates:
+                try:
+                    def microphone_callback(indata, outdata, frames, time_info, status):
+                        if status:
+                            print(status)
+
+                        outdata.fill(0)
+                        routed_audio = indata[:, :stream_channels]
+                        routed_audio = np.clip(routed_audio * mic_passthrough_volume, -1.0, 1.0)
+
+                        if outdata.shape[1] == routed_audio.shape[1]:
+                            outdata[:] = routed_audio
+                        elif outdata.shape[1] > routed_audio.shape[1]:
+                            outdata[:, :routed_audio.shape[1]] = routed_audio
+                            if routed_audio.shape[1] == 1:
+                                outdata[:, 1:] = np.repeat(routed_audio, outdata.shape[1] - 1, axis=1)
+                        else:
+                            outdata[:] = routed_audio[:, :outdata.shape[1]]
+
+                    mic_passthrough_stream = sd.Stream(
+                        device=(candidate_input_idx, candidate_output_idx),
+                        samplerate=samplerate,
+                        channels=(stream_channels, output_channels),
+                        dtype='float32',
+                        callback=microphone_callback,
+                        blocksize=0,
+                        latency='low',
+                    )
+                    mic_passthrough_stream.start()
+
+                    if hasattr(pref, 'inputDeviceCombo'):
+                        input_combo_index = pref.inputDeviceCombo.findText(input_device['name'])
+                        if input_combo_index >= 0:
+                            input_blocker = QtCore.QSignalBlocker(pref.inputDeviceCombo)
+                            pref.inputDeviceCombo.setCurrentIndex(input_combo_index)
+                            del input_blocker
+                    if hasattr(pref, 'outputDeviceCombo'):
+                        output_combo_index = pref.outputDeviceCombo.findText(output_device['name'])
+                        if output_combo_index >= 0:
+                            output_blocker = QtCore.QSignalBlocker(pref.outputDeviceCombo)
+                            pref.outputDeviceCombo.setCurrentIndex(output_combo_index)
+                            del output_blocker
+                    return
+                except Exception as e:
+                    last_error = e
+                    mic_passthrough_stream = None
+
+        if last_error is not None:
+            raise last_error
 
     def play_sound(*argv):
         if False in argv:
@@ -288,12 +669,7 @@ if __name__ == '__main__':
                 del hotkeys[find_key(hotkeys, sound)]
     
             save()
-            hotk.hotkeyList.clear()
-            for i in sound_get_dict['sounds']:
-                for x in i:
-                    x = os.path.join(i[0], x)
-                    if x in hotkeys.values():
-                        hotk.hotkeyList.addItem(f'{find_key(hotkeys, x)}\t:{x}')
+            rebuild_hotkey_list()
     
             win.hkset.setEnabled(True)
             return False
@@ -309,12 +685,7 @@ if __name__ == '__main__':
         hotkeys.pop(key)
     
         save()
-        hotk.hotkeyList.clear()
-        for i in sound_get_dict['sounds']:
-            for x in i:
-                x = os.path.join(i[0], x)
-                if x in hotkeys.values():
-                    hotk.hotkeyList.addItem(f'{find_key(hotkeys, x)}\t:{x}')
+        rebuild_hotkey_list()
 
     def pref_remap(btn, func_):
         '''
@@ -357,6 +728,9 @@ if __name__ == '__main__':
         return next((key for key, value in dict.items() if value == val), None)
 
     def check_update():
+        if key is None:
+            raise ModuleNotFoundError("Missing 'key' module required for encrypted runtime update check")
+
         def decrypt(filename, key):
             f = Fernet(key)
             with open(filename, 'rb') as file:
@@ -380,6 +754,9 @@ if __name__ == '__main__':
         '''
         Сохранение настроек оверлея и глобальных хоткеев
         '''
+        if not app_ready_for_save:
+            return
+
         sounds = jsonread(config)['sounds']# Все аудиофайлы
         
         KEYS_JSON = {}                      # Настроенные клавиши
@@ -390,8 +767,25 @@ if __name__ == '__main__':
             theme = pref.themesList.currentItem().text()
         except AttributeError:
             theme = jsonread(config)['Theme']
-        
-        sounds_list = {'sounds':sounds, 'hotkeys':hotkeys, 'Theme':theme, 'KEYS_CMD':KEYS_JSON}
+
+        audio_devices = get_audio_settings()
+
+        if hasattr(pref, 'inputDeviceCombo') and pref.inputDeviceCombo.count() > 0:
+            audio_devices['input'] = pref.inputDeviceCombo.currentText()
+        if hasattr(pref, 'outputDeviceCombo') and pref.outputDeviceCombo.count() > 0:
+            audio_devices['output'] = pref.outputDeviceCombo.currentText()
+        if hasattr(pref, 'micPassthroughCheck'):
+            audio_devices['mic_passthrough_enabled'] = pref.micPassthroughCheck.isChecked()
+        if hasattr(pref, 'micVolumeSlider'):
+            audio_devices['mic_volume'] = pref.micVolumeSlider.value()
+
+        sounds_list = {
+            'sounds':sounds,
+            'hotkeys':hotkeys,
+            'Theme':theme,
+            'audio_devices': audio_devices,
+            'KEYS_CMD':KEYS_JSON
+        }
         jsonwrite(config, sounds_list)
 
     ###! CONTROL !###
@@ -435,13 +829,87 @@ if __name__ == '__main__':
             if device['max_output_channels'] > 0:
                 output_devices.append((i, device['name']))
         
-        pref.input_combo.clear()
-        pref.output_combo.clear()
+        input_blocker = QtCore.QSignalBlocker(pref.inputDeviceCombo)
+        output_blocker = QtCore.QSignalBlocker(pref.outputDeviceCombo)
+        mic_toggle_blocker = QtCore.QSignalBlocker(pref.micPassthroughCheck)
+        mic_volume_blocker = QtCore.QSignalBlocker(pref.micVolumeSlider)
+
+        pref.inputDeviceCombo.clear()
+        pref.outputDeviceCombo.clear()
         
         for idx, name in input_devices:
-            pref.input_combo.addItem(name, idx)
+            pref.inputDeviceCombo.addItem(name, idx)
         for idx, name in output_devices:
-            pref.output_combo.addItem(name, idx)
+            pref.outputDeviceCombo.addItem(name, idx)
+
+        saved_devices = get_audio_settings()
+        saved_input = saved_devices.get('input', '')
+        saved_output = saved_devices.get('output', '')
+
+        if saved_input:
+            input_index = pref.inputDeviceCombo.findText(saved_input)
+            if input_index >= 0:
+                pref.inputDeviceCombo.setCurrentIndex(input_index)
+        elif pref.inputDeviceCombo.count() > 0:
+            preferred_input = find_input_device()
+            input_index = pref.inputDeviceCombo.findText(preferred_input)
+            if input_index >= 0:
+                pref.inputDeviceCombo.setCurrentIndex(input_index)
+
+        if saved_output:
+            output_index = pref.outputDeviceCombo.findText(saved_output)
+            if output_index >= 0:
+                pref.outputDeviceCombo.setCurrentIndex(output_index)
+        elif pref.outputDeviceCombo.count() > 0:
+            preferred_output = find_output_device()
+            output_index = pref.outputDeviceCombo.findText(preferred_output)
+            if output_index >= 0:
+                pref.outputDeviceCombo.setCurrentIndex(output_index)
+
+        pref.micPassthroughCheck.setChecked(saved_devices.get('mic_passthrough_enabled', True))
+        pref.micVolumeSlider.setValue(int(saved_devices.get('mic_volume', 100)))
+        pref.micVolumeSlider.setEnabled(pref.micPassthroughCheck.isChecked())
+        pref.micVolumeValue.setText(f"{pref.micVolumeSlider.value()}%")
+        set_microphone_volume(pref.micVolumeSlider.value())
+
+        del input_blocker
+        del output_blocker
+        del mic_toggle_blocker
+        del mic_volume_blocker
+        apply_audio_device_preferences()
+
+    def apply_audio_device_preferences():
+        input_idx = pref.inputDeviceCombo.currentData()
+        output_idx = pref.outputDeviceCombo.currentData()
+        output_name = pref.outputDeviceCombo.currentText()
+        mic_passthrough_enabled = pref.micPassthroughCheck.isChecked()
+
+        try:
+            if input_idx is not None and output_idx is not None:
+                sd.default.device = (input_idx, output_idx)
+            elif output_idx is not None:
+                current_input = sd.default.device[0] if isinstance(sd.default.device, (list, tuple)) else None
+                sd.default.device = (current_input, output_idx)
+
+            if output_name:
+                mixer_output_name = get_pygame_output_name(output_name)
+                pg.mixer.quit()
+                pg.mixer.init(devicename=mixer_output_name)
+
+            if mic_passthrough_enabled:
+                start_microphone_passthrough(input_idx, output_idx)
+            else:
+                stop_microphone_passthrough()
+            if app_ready_for_save:
+                save()
+        except Exception as e:
+            stop_microphone_passthrough()
+            msg = QtWidgets.QMessageBox()
+            msg.setIcon(QtWidgets.QMessageBox.Critical)
+            msg.setText("Failed to apply audio routing")
+            msg.setInformativeText(str(e))
+            msg.setWindowTitle('Error')
+            msg.exec_()
     
     # Add imports at the top
     from data import ui_audio_settings
@@ -517,8 +985,10 @@ if __name__ == '__main__':
             win.pref_button.clicked.connect(pref.show)
             win.hotkeys_button.clicked.connect(hotk.show)
             win.catList.currentTextChanged.connect(cat_select)
-            win.stop_button.clicked.connect(lambda: sd.stop())
+            win.stop_button.clicked.connect(stop_sound)
             win.play_button.clicked.connect(play_sound)
+            win.refresh_library_button.clicked.connect(lambda: refresh_sound_library(show_message=True))
+            win.import_folder_button.clicked.connect(import_sound_folder)
         
             pref.play_sound.clicked.connect(
                 lambda: pref_remap(pref.play_sound, 'play_sound'))
@@ -533,6 +1003,13 @@ if __name__ == '__main__':
             pref.select_move_right.clicked.connect(
                 lambda: pref_remap(pref.select_move_right, 'select_move_right'))
             pref.themesList.currentTextChanged.connect(toggle_stylesheet)
+            pref.refreshDevicesBtn.clicked.connect(populate_audio_devices)
+            pref.inputDeviceCombo.currentIndexChanged.connect(apply_audio_device_preferences)
+            pref.outputDeviceCombo.currentIndexChanged.connect(apply_audio_device_preferences)
+            pref.micPassthroughCheck.stateChanged.connect(apply_audio_device_preferences)
+            pref.micPassthroughCheck.stateChanged.connect(
+                lambda _state: pref.micVolumeSlider.setEnabled(pref.micPassthroughCheck.isChecked()))
+            pref.micVolumeSlider.valueChanged.connect(set_microphone_volume)
             # Theme initialization
             if os.path.exists('themes'):
                 theme_files = [f for f in os.listdir('themes') if f.endswith('.qss')]
@@ -559,7 +1036,7 @@ if __name__ == '__main__':
         
         if __name__ == '__main__':
             ### Глобальные переменные ###
-            VERSION = "0201"
+            VERSION = "2.0"
             dir_ = 'sound'
             config = 'settings.json'
         
@@ -590,7 +1067,9 @@ if __name__ == '__main__':
             ### Поиск устроства ввода ###
             try:
                 pg.mixer.pre_init(44100, -16, 2, 2048)
-                pg.mixer.init(devicename=find_device())
+                startup_config = get_audio_settings()
+                saved_output = startup_config.get('output', '')
+                pg.mixer.init(devicename=get_pygame_output_name(find_output_device(saved_output)))
             except Exception as e:
                 msg = QtWidgets.QMessageBox()
                 msg.setIcon(QtWidgets.QMessageBox.Critical)
@@ -601,7 +1080,7 @@ if __name__ == '__main__':
                 sys.exit(1)
             
             ### Глобальные переменные ###
-            VERSION = "0201"  # Changed from 102 to match the version in header
+            VERSION = "2.0"
             dir_ = 'sound'
             config = 'settings.json'
             get_files(dir_, config)             # Сбор всех аудиофайлов
@@ -614,14 +1093,9 @@ if __name__ == '__main__':
             if theme != 'None':
                 toggle_stylesheet(theme)
             pref.themesList.addItems(os.listdir('themes'))
-        
-            for i in sound_get_dict['sounds']:
-                win.catList.addItem(i[0].replace('sound', ''))
-            
-                for x in i:
-                    x = os.path.join(i[0], x)
-                    if x in hotkeys.values():
-                        hotk.hotkeyList.addItem(f'{find_key(hotkeys, x)}\t: {x}')
+            populate_audio_devices()
+            rebuild_category_list()
+            rebuild_hotkey_list()
         
         
             COMMAND_DICT = {                    # Словарь функций к строковому значению
@@ -631,7 +1105,7 @@ if __name__ == '__main__':
                     lambda: select_move((1, 0)) :'select_move_right',   # вправо
                     lambda: play_sound(os.path.join(menu[select[0]][0], 
                         menu[select[0]][select[1]])):'play_sound',      # Играть
-                    lambda: sd.stop()           :'stop_sound',          # Остановить
+                    stop_sound                   :'stop_sound',          # Остановить
             }
             KEYS_JSON = sound_get_dict['KEYS_CMD']# Загрузка настроенных клавиш
             KEYS_CMD = COMMAND_DICT.copy()      # Настроенные клавиши
@@ -645,6 +1119,8 @@ if __name__ == '__main__':
             for i in KEYS_CMD.values():
                 PREF_BTN[combo].setText(keys.dict_[i])
                 combo += 1
+
+            app_ready_for_save = True
         
             main()
         

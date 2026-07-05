@@ -14,185 +14,138 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(640, 480)
-        MainWindow.setMinimumSize(QtCore.QSize(640, 480))
-        MainWindow.setMaximumSize(QtCore.QSize(640, 480))
+        MainWindow.resize(980, 660)
+        MainWindow.setMinimumSize(QtCore.QSize(980, 660))
+        MainWindow.setMaximumSize(QtCore.QSize(980, 660))
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("icon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
-        MainWindow.setStyleSheet("QWidget{\n"
-"    background: rgb(44, 44, 44);    \n"
-"    font: 25 14pt \"Calibri Light\";\n"
-"}\n"
-"\n"
-"QLabel{\n"
-"    background: none\n"
-"}\n"
-"\n"
-"QPushButton{\n"
-"    background: rgb(58, 58, 58);\n"
-"    border: none;\n"
-"}\n"
-"\n"
-"QPushButton:hover{\n"
-"    background: rgb(53, 53, 53);\n"
-"}\n"
-"\n"
-"QListWidget{\n"
-"    margin: 4px;\n"
-"    border: none;\n"
-"}\n"
-"QListWidget::item[Custom=\"true\"]{\n"
-"    background: rgb(48, 48, 48);\n"
-"}\n"
-"QListWidget::item:hover{\n"
-"    background:  rgb(53, 53, 53);\n"
-"}\n"
-"QListWidget::item:selected{\n"
-"    background: rgb(48, 48, 48);\n"
-"    color: black;\n"
-"}\n"
-"\n"
-"QScrollBar:vertical{\n"
-"    border: 1px transparent rgb(58, 58, 58);\n"
-"    border-radius: 4px;\n"
-"    background: rgb(48, 48, 48);\n"
-"    width: 16px;\n"
-"}\n"
-"QScrollBar::handle:vertical{\n"
-"    background: rgb(48, 48, 48);\n"
-"}\n"
-"QScrollBar::sub-page:vertical{\n"
-"    background: rgb(58, 58, 58);\n"
-"}\n"
-"QScrollBar::add-page:vertical{\n"
-"    background: rgb(58, 58, 58);\n"
-"}\n"
-"\n"
-"#background{\n"
-"    background:rgb(48, 48, 48);\n"
-"}\n"
-"\n"
-"#exit_button{\n"
-"    margin-bottom: 1px;\n"
-"}\n"
-"#exit_button:hover{\n"
-"    color: black;\n"
-"    background: rgba(254, 119, 122, 128);\n"
-"}\n"
-"\n"
-"#min_button{\n"
-"    margin-bottom: 1px;\n"
-"}\n"
-"#min_button:hover{\n"
-"    color: black;\n"
-"    background: rgba(194, 213, 254, 128);\n"
-"}\n"
-"\n"
-"#pref_button{\n"
-"    margin-bottom: 1px;\n"
-"}\n"
-"#pref_button:hover{\n"
-"    color: black;\n"
-"    background: rgba(194, 213, 254, 128);\n"
-"}\n"
-"\n"
-"#hotkeys_button{\n"
-"    margin-bottom: 1px;\n"
-"}\n"
-"#hotkeys_button:hover{\n"
-"    color: black;\n"
-"    background: rgba(194, 213, 254, 128);\n"
-"}\n"
-"\n"
-"#select_label{\n"
-"    background: black;\n"
-"    color: white;\n"
-"}\n"
-"\n"
-"#catList::item{\n"
-"    padding: 6px;\n"
-"}\n"
-"\n"
-"QSlider::groove:horizontal {\n"
-"    border: none;\n"
-"    height: 40px;\n"
-"    margin: 0px;\n"
-"}\n"
-"QSlider::handle:horizontal {\n"
-"    background-color: rgb(53, 53, 53);\n"
-"    border: none;\n"
-"    height: 40px;\n"
-"    width: 40px;\n"
-"     margin: -15px 0px;\n"
-"}\n"
-"QSlider::sub-page:horizontal {\n"
-"    border: none;\n"
-"    height: 40px;\n"
-"    margin: 1px;\n"
-"    background: rgb(63, 63, 63);\n"
-"}")
+        MainWindow.setStyleSheet("QWidget{background:#151821;color:#f5f7fb;font: 11pt \"Segoe UI\";}\n"
+"QPushButton{background:#2b3245;border:1px solid #3d4963;border-radius:12px;padding:10px 14px;font-weight:600;}\n"
+"QPushButton:hover{background:#36415b;}\n"
+"QPushButton:pressed{background:#20283a;}\n"
+"QListWidget{background:#1b2130;border:1px solid #313b52;border-radius:16px;padding:10px;outline:none;}\n"
+"QListWidget::item{padding:10px 12px;border-radius:10px;margin:2px 0;}\n"
+"QListWidget::item:hover{background:#2a3449;}\n"
+"QListWidget::item:selected{background:#6d7cff;color:white;}\n"
+"QLabel{background:transparent;}\n"
+"QSlider::groove:horizontal{height:8px;background:#283146;border-radius:4px;}\n"
+"QSlider::sub-page:horizontal{background:#6d7cff;border-radius:4px;}\n"
+"QSlider::handle:horizontal{background:#eef2ff;border:2px solid #6d7cff;width:18px;height:18px;margin:-6px 0;border-radius:9px;}\n"
+"QScrollBar:vertical{background:transparent;width:12px;margin:4px;}\n"
+"QScrollBar::handle:vertical{background:#36415b;border-radius:6px;min-height:24px;}\n"
+"QScrollBar::add-line:vertical,QScrollBar::sub-line:vertical,QScrollBar::add-page:vertical,QScrollBar::sub-page:vertical{background:none;border:none;}\n"
+"#background{background:#0f1320;}\n"
+"#sidebarCard,#contentCard{background:#171c2b;border:1px solid #252d41;border-radius:24px;}\n"
+"#headerStrip{background:#101522;border-bottom:1px solid #252d41;}\n"
+"#select_label{background:#101522;border:1px solid #2a3248;border-radius:16px;color:#eef2ff;padding:10px 16px;font:700 11pt \"Segoe UI\";}\n"
+"#app_title{font:700 18pt \"Segoe UI Semibold\";color:#ffffff;}\n"
+"#app_subtitle,#volume_hint,#library_hint{color:#98a4bf;font:10pt \"Segoe UI\";}\n"
+"#cat_label,#library_label,#volume_label{font:700 10pt \"Segoe UI Semibold\";color:#cfd7ea;letter-spacing:0.5px;}\n"
+"#play_button{background:#6d7cff;border:1px solid #7f8cff;color:white;}\n"
+"#play_button:hover{background:#7c8aff;}\n"
+"#refresh_library_button{background:#2d3548;}\n"
+"#import_folder_button{background:#1f8f78;border:1px solid #22ab8c;color:white;}\n"
+"#import_folder_button:hover{background:#24a389;}\n"
+"#stop_button{background:#2d3548;}\n"
+"#hkset{background:#1f8f78;border:1px solid #22ab8c;color:white;}\n"
+"#hkset:hover{background:#24a389;}\n"
+"#pref_button,#hotkeys_button,#min_button,#exit_button{background:transparent;border:none;border-radius:12px;padding:8px 12px;}\n"
+"#pref_button:hover,#hotkeys_button:hover,#min_button:hover{background:#20283a;}\n"
+"#exit_button:hover{background:#4a1f28;color:#ffd7dd;}")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.background = QtWidgets.QWidget(self.centralwidget)
-        self.background.setGeometry(QtCore.QRect(0, 0, 641, 481))
+        self.background.setGeometry(QtCore.QRect(0, 0, 980, 660))
         self.background.setStyleSheet("")
         self.background.setObjectName("background")
+        self.headerStrip = QtWidgets.QWidget(self.background)
+        self.headerStrip.setGeometry(QtCore.QRect(0, 0, 980, 64))
+        self.headerStrip.setObjectName("headerStrip")
+        self.app_title = QtWidgets.QLabel(self.headerStrip)
+        self.app_title.setGeometry(QtCore.QRect(28, 10, 240, 28))
+        self.app_title.setObjectName("app_title")
+        self.app_subtitle = QtWidgets.QLabel(self.headerStrip)
+        self.app_subtitle.setGeometry(QtCore.QRect(28, 34, 360, 20))
+        self.app_subtitle.setObjectName("app_subtitle")
         self.min_button = QtWidgets.QPushButton(self.background)
-        self.min_button.setGeometry(QtCore.QRect(560, 0, 41, 31))
+        self.min_button.setGeometry(QtCore.QRect(880, 12, 40, 40))
         self.min_button.setStyleSheet("")
         self.min_button.setObjectName("min_button")
         self.exit_button = QtWidgets.QPushButton(self.background)
-        self.exit_button.setGeometry(QtCore.QRect(600, 0, 41, 31))
+        self.exit_button.setGeometry(QtCore.QRect(926, 12, 40, 40))
         self.exit_button.setStyleSheet("")
         self.exit_button.setObjectName("exit_button")
         self.pref_button = QtWidgets.QPushButton(self.background)
-        self.pref_button.setGeometry(QtCore.QRect(0, 0, 111, 31))
+        self.pref_button.setGeometry(QtCore.QRect(650, 12, 104, 40))
         self.pref_button.setObjectName("pref_button")
         self.hotkeys_button = QtWidgets.QPushButton(self.background)
-        self.hotkeys_button.setGeometry(QtCore.QRect(110, 0, 111, 31))
+        self.hotkeys_button.setGeometry(QtCore.QRect(760, 12, 110, 40))
         self.hotkeys_button.setObjectName("hotkeys_button")
+        self.sidebarCard = QtWidgets.QWidget(self.background)
+        self.sidebarCard.setGeometry(QtCore.QRect(24, 88, 256, 548))
+        self.sidebarCard.setObjectName("sidebarCard")
+        self.contentCard = QtWidgets.QWidget(self.background)
+        self.contentCard.setGeometry(QtCore.QRect(296, 88, 660, 548))
+        self.contentCard.setObjectName("contentCard")
         self.stop_button = QtWidgets.QPushButton(self.background)
-        self.stop_button.setGeometry(QtCore.QRect(0, 120, 171, 41))
+        self.stop_button.setGeometry(QtCore.QRect(44, 214, 216, 48))
         self.stop_button.setObjectName("stop_button")
         self.hkset = QtWidgets.QPushButton(self.background)
-        self.hkset.setGeometry(QtCore.QRect(0, 200, 171, 41))
+        self.hkset.setGeometry(QtCore.QRect(44, 270, 216, 48))
         self.hkset.setObjectName("hkset")
         self.soundList = QtWidgets.QListWidget(self.background)
-        self.soundList.setGeometry(QtCore.QRect(170, 60, 471, 421))
+        self.soundList.setGeometry(QtCore.QRect(320, 214, 612, 398))
         self.soundList.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.soundList.setFrameShadow(QtWidgets.QFrame.Raised)
         self.soundList.setObjectName("soundList")
         self.catList = QtWidgets.QListWidget(self.background)
-        self.catList.setGeometry(QtCore.QRect(0, 280, 171, 201))
+        self.catList.setGeometry(QtCore.QRect(44, 404, 216, 208))
         self.catList.setStyleSheet("")
         self.catList.setObjectName("catList")
         self.cat_label = QtWidgets.QLabel(self.background)
-        self.cat_label.setGeometry(QtCore.QRect(6, 253, 161, 31))
+        self.cat_label.setGeometry(QtCore.QRect(44, 370, 120, 24))
         font = QtGui.QFont()
-        font.setFamily("Calibri Light")
-        font.setPointSize(14)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(3)
+        font.setFamily("Segoe UI Semibold")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.cat_label.setFont(font)
-        self.cat_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.cat_label.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.cat_label.setObjectName("cat_label")
         self.volume_slider = QtWidgets.QSlider(self.background)
-        self.volume_slider.setGeometry(QtCore.QRect(10, 170, 151, 20))
+        self.volume_slider.setGeometry(QtCore.QRect(44, 156, 216, 22))
         self.volume_slider.setMaximum(100)
         self.volume_slider.setProperty("value", 70)
         self.volume_slider.setOrientation(QtCore.Qt.Horizontal)
         self.volume_slider.setObjectName("volume_slider")
         self.play_button = QtWidgets.QPushButton(self.centralwidget)
-        self.play_button.setGeometry(QtCore.QRect(0, 70, 171, 41))
+        self.play_button.setGeometry(QtCore.QRect(44, 158, 216, 48))
         self.play_button.setObjectName("play_button")
         self.select_label = QtWidgets.QLabel(self.centralwidget)
-        self.select_label.setGeometry(QtCore.QRect(0, 30, 641, 31))
+        self.select_label.setGeometry(QtCore.QRect(320, 104, 612, 52))
         self.select_label.setStyleSheet("")
         self.select_label.setText("")
-        self.select_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.select_label.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.select_label.setObjectName("select_label")
+        self.volume_label = QtWidgets.QLabel(self.background)
+        self.volume_label.setGeometry(QtCore.QRect(44, 122, 90, 22))
+        self.volume_label.setObjectName("volume_label")
+        self.volume_hint = QtWidgets.QLabel(self.background)
+        self.volume_hint.setGeometry(QtCore.QRect(44, 186, 180, 18))
+        self.volume_hint.setObjectName("volume_hint")
+        self.library_label = QtWidgets.QLabel(self.background)
+        self.library_label.setGeometry(QtCore.QRect(320, 176, 180, 22))
+        self.library_label.setObjectName("library_label")
+        self.refresh_library_button = QtWidgets.QPushButton(self.background)
+        self.refresh_library_button.setGeometry(QtCore.QRect(680, 168, 120, 36))
+        self.refresh_library_button.setObjectName("refresh_library_button")
+        self.import_folder_button = QtWidgets.QPushButton(self.background)
+        self.import_folder_button.setGeometry(QtCore.QRect(812, 168, 120, 36))
+        self.import_folder_button.setObjectName("import_folder_button")
+        self.library_hint = QtWidgets.QLabel(self.background)
+        self.library_hint.setGeometry(QtCore.QRect(320, 616, 280, 18))
+        self.library_hint.setObjectName("library_hint")
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -201,6 +154,8 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.app_title.setText(_translate("MainWindow", "SundPood"))
+        self.app_subtitle.setText(_translate("MainWindow", "Virtual mix soundboard"))
         self.min_button.setText(_translate("MainWindow", "-"))
         self.exit_button.setText(_translate("MainWindow", "X"))
         self.pref_button.setText(_translate("MainWindow", "Settings"))
@@ -209,3 +164,9 @@ class Ui_MainWindow(object):
         self.hkset.setText(_translate("MainWindow", "Set hotkey"))
         self.cat_label.setText(_translate("MainWindow", "Categories"))
         self.play_button.setText(_translate("MainWindow", "Play"))
+        self.volume_label.setText(_translate("MainWindow", "Volume"))
+        self.volume_hint.setText(_translate("MainWindow", "Playback level for sounds"))
+        self.library_label.setText(_translate("MainWindow", "Sound Library"))
+        self.refresh_library_button.setText(_translate("MainWindow", "Refresh"))
+        self.import_folder_button.setText(_translate("MainWindow", "Import Folder"))
+        self.library_hint.setText(_translate("MainWindow", "Select a category and trigger a sound"))
